@@ -283,6 +283,8 @@ namespace Floe.UI
                 case IrcCode.RPL_LIST:
                 case IrcCode.RPL_LISTSTART:
                 case IrcCode.RPL_LISTEND:
+                case IrcCode.RPL_ENDOFWHO:
+                case IrcCode.RPL_WHOREPLY:
                     e.Handled = true;
                     break;
             }
