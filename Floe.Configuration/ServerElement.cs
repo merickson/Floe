@@ -75,6 +75,10 @@ namespace Floe.Configuration
 
 	public sealed class ServerElement : ConfigurationElement
 	{
+		public override int GetHashCode()
+		{
+			return System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(this);
+		}
 		[ConfigurationProperty("name")]
 		public string Name
 		{
