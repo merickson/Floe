@@ -129,6 +129,7 @@ namespace Floe.UI
 		protected override void OnActivated(EventArgs e)
 		{
 			this.Opacity = App.Settings.Current.Windows.ActiveOpacity;
+            this.clearOverlayIcon();
 
 			base.OnActivated(e);
 		}

@@ -132,6 +132,7 @@ namespace Floe.UI
 				if (!window.IsActive)
 				{
 					Interop.WindowHelper.FlashWindow(window);
+                    window.setOverlayIcon(OverlayIconState.PrivateMessage);
 				}
 			}
 		}

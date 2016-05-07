@@ -146,6 +146,7 @@
       <DependentUpon>ChatWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="ChatWindow\ChatWindow_WndProc.cs" />
+    <Compile Include="ChatWindow\ChatWindow_OverlayIcon.cs" />
     <Compile Include="Converters.cs" />
     <Compile Include="Dialogs\ConfirmDialog.xaml.cs">
       <DependentUpon>ConfirmDialog.xaml</DependentUpon>
@@ -308,7 +309,15 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\App.ico" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Resources\GreenBubble.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\TealBubble.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\RedBubble.ico" />
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

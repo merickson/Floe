@@ -24,8 +24,30 @@
 		<CommandBinding Command="local:ChatWindow.MaximizeCommand" Executed="ExecuteMaximize"/>
 		<CommandBinding Command="local:ChatWindow.CloseCommand" Executed="ExecuteClose"/>
 	</Window.CommandBindings>
-	<Window.Resources>
-		<ContextMenu Placement="MousePoint" x:Key="NotifyMenu">
+    <!-- Getting a reference to the task bar -->
+    <Window.TaskbarItemInfo>
+        <TaskbarItemInfo />
+    </Window.TaskbarItemInfo>
+    <Window.Resources>
+        <DrawingImage x:Key="RedBubble">
+            <DrawingImage.Drawing>
+                <ImageDrawing ImageSource="..\Resources\RedBubble.ico"
+                          Rect="0,0,16,16" />
+            </DrawingImage.Drawing>
+        </DrawingImage>
+        <DrawingImage x:Key="TealBubble">
+            <DrawingImage.Drawing>
+                <ImageDrawing ImageSource="..\Resources\TealBubble.ico"
+                          Rect="0,0,16,16" />
+            </DrawingImage.Drawing>
+        </DrawingImage>
+        <DrawingImage x:Key="GreenBubble">
+            <DrawingImage.Drawing>
+                <ImageDrawing ImageSource="..\Resources\GreenBubble.ico"
+                          Rect="0,0,16,16" />
+            </DrawingImage.Drawing>
+        </DrawingImage>
+        <ContextMenu Placement="MousePoint" x:Key="NotifyMenu">
 			<MenuItem Click="NotifyQuit_Click" Header="Quit"/>
 		</ContextMenu>
 
@@ -363,8 +385,8 @@
 												<Setter TargetName="arrow" Property="Visibility" Value="Visible"/>
 											</DataTrigger.Setters>
 										</DataTrigger>
-										<DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=Page.NotifyState}" Value="ChatActivity">
-											<DataTrigger.Setters>
+                                        <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=Page.NotifyState}" Value="ChatActivity">
+                                            <DataTrigger.Setters>
 												<Setter TargetName="arrow" Property="Fill" Value="{StaticResource chatBrush}"/>
 												<Setter TargetName="arrow" Property="Stroke" Value="{StaticResource chatBrush}"/>
 												<Setter TargetName="arrow" Property="Visibility" Value="Visible"/>

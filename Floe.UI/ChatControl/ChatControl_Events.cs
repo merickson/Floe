@@ -112,6 +112,19 @@ namespace Floe.UI
                             App.DoEvent("activeAlert");
                         }
                     }
+                    if (App.IsOverlayIconMatch(this.Session.Nickname, e.Text))
+                    {
+                        if(_window != null && !_window.IsActive)
+                        {
+                            var window = _window as ChatWindow;
+                            window.setOverlayIcon(OverlayIconState.OwnNickname);
+                        }
+                    }
+                    if(_window != null && !_window.IsActive)
+                    {
+                        var window = _window as ChatWindow;
+                        window.setOverlayIcon(OverlayIconState.ChatActivity);
+                    }
 
                     if (e.From.Prefix.Equals("*buffextras!buffextras@znc.in"))
                     {
@@ -168,6 +181,11 @@ namespace Floe.UI
                             if (this.VisualParent == null)
                             {
                                 App.DoEvent("privateMessage");
+                            }
+                            var window = App.Current.MainWindow as ChatWindow;
+                            if (_window != null && !_window.IsActive)
+                            {
+                                window.setOverlayIcon(OverlayIconState.PrivateMessage);
                             }
                         }
                     }

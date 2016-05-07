@@ -93,6 +93,20 @@ namespace Floe.Configuration
 			set { this["attentionOnOwnNickname"] = value; this.OnPropertyChanged("AttentionOnOwnNickname"); }
 		}
 
+        [ConfigurationProperty("overlayIconOnChatActivity", DefaultValue = false)]
+        public bool OverlayIconOnChatActivity
+        {
+            get { return (bool)this["overlayIconOnChatActivity"]; }
+            set { this["overlayIconOnChatActivity"] = value; this.OnPropertyChanged("OverlayIconOnChatActivity"); }
+        }
+
+        [ConfigurationProperty("overlayIconChangeColor", DefaultValue = false)]
+        public bool OverlayIconChangeColor
+        {
+            get { return (bool)this["overlayIconChangeColor"]; }
+            set { this["overlayIconChangeColor"] = value; this.OnPropertyChanged("OverlayIconChangeColor"); }
+        }
+
 		[ConfigurationProperty("attentionPatterns", DefaultValue = "")]
 		public string AttentionPatterns
 		{
