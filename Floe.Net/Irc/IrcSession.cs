@@ -953,11 +953,15 @@ namespace Floe.Net
 		{
 			var handler = this.Joined;
 			var e = new IrcJoinEventArgs(message);
-			if (this.IsSelf(e.Who.Nickname))
-			{
-				handler = this.SelfJoined;
-			}
-			this.RaiseEvent(handler, e);
+            if (e.Who == null)
+            {
+                handler = this.SelfJoined;
+            }
+            else if (this.IsSelf(e.Who.Nickname))
+            {
+                handler = this.SelfJoined;
+            }
+            this.RaiseEvent(handler, e);
 		}
 
 		private void OnPart(IrcMessage message)
