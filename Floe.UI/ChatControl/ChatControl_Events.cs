@@ -457,7 +457,8 @@ namespace Floe.UI
             {
                 if (!isIgnored)
                 {
-                    this.Write("Quit", e.Message.Time, string.Format("{0} has quit ({1})", e.Who.Nickname, e.Text));
+                    this.Write("Quit", e.Message.Time, string.Format("{0} ({1}@{2}) has quit ({3})",
+                        e.Who.Nickname, e.Who.Username, e.Who.Hostname, e.Text));
                 }
                 _nickList.Remove(e.Who.Nickname);
             }
