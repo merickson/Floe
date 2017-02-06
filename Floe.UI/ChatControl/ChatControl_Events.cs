@@ -470,7 +470,7 @@ namespace Floe.UI
             {
                 if (e.Who != null)
                 {
-                    this.Write("Mode", e.Message.Time, string.Format("{0} set mode: {1}", e.Who.Nickname,
+                    this.Write("Mode", e.Message.Time, string.Format("{0} sets mode: {1}", e.Who.Nickname,
                         string.Join(" ", IrcChannelMode.RenderModes(e.Modes))));
 
                     _channelModes = (from m in e.Modes.Where((newMode) => newMode.Parameter == null && newMode.Set).

@@ -65,7 +65,10 @@ namespace Floe.Net
 		/// <returns>Returns true if the name refers to a channel, false if it refers to a user.</returns>
 		public static bool IsChannelName(string name)
 		{
-			return name.Length > 1 && name[0] == '#' || name[0] == '+' || name[0] == '&' || name[0] == '!';
+			if (name.Length < 1)
+				return false;
+			else
+				return name[0] == '#' || name[0] == '+' || name[0] == '&' || name[0] == '!';
 		}
 
 		/// <summary>

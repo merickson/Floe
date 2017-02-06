@@ -24,7 +24,7 @@ namespace Floe.UI
 
 		#endregion
 
-		private const double MinNickListWidth = 50.0;
+		private const double MinNickListWidth = 100.0;
 
 		private LinkedList<string> _history;
 		private LinkedListNode<string> _historyNode;

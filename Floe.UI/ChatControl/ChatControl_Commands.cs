@@ -371,6 +371,7 @@ namespace Floe.UI
 					this.Session.Nick(args[0]);
 					break;
 				case "NOTICE":
+				case "N":
 					args = Split(command, arguments, 2, 2);
 					this.Session.Notice(new IrcTarget(args[0]), args[1]);
 					break;
@@ -387,6 +388,7 @@ namespace Floe.UI
 					}
 					break;
 				case "PART":
+				case "P":
 				case "LEAVE":
 					args = Split(command, arguments, 1, 1, true);
 					this.Session.Part(args[0]);
