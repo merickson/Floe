@@ -390,8 +390,15 @@ namespace Floe.UI
 				case "PART":
 				case "P":
 				case "LEAVE":
-					args = Split(command, arguments, 1, 1, true);
-					this.Session.Part(args[0]);
+					args = Split(command, arguments, 1, 2, true);
+					if (args.Length == 2)
+					{
+						this.Session.Part(args[0], args[1]);
+					}
+					else
+					{
+						this.Session.Part(args[0]);
+					}
 					break;
 				case "TOPIC":
 					args = Split(command, arguments, 1, 2, true);
@@ -403,6 +410,16 @@ namespace Floe.UI
 					{
 						this.Session.Topic(args[0]);
 					}
+					break;
+				case "HOP":
+				case "CYCLE":
+				case "CY":
+					args = Split(command, arguments, 1, 2, true);
+					if (args.Length == 2)
+						this.Session.Part(args[0], args[1]);
+					else
+						this.Session.Part(args[0]);
+					this.Session.Join(args[0]);
 					break;
 				case "INVITE":
 					args = Split(command, arguments, 2, 2);

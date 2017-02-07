@@ -57,28 +57,28 @@ namespace Floe.UI
             }
         }
 
-        private void Session_Noticed(object sender, IrcMessageEventArgs e)
-        {
-            if (App.IsIgnoreMatch(e.From, IgnoreActions.Notice))
-            {
-                return;
-            }
+		private void Session_Noticed(object sender, IrcMessageEventArgs e)
+		{
+			if (App.IsIgnoreMatch(e.From, IgnoreActions.Notice))
+			{
+				return;
+			}
+			if ((this.IsServer) || (this.Target.IsChannel && this.Target.Equals(e.To)) 
+				|| (IsDefault && this.IsChannel && e.From != null && _nickList.Contains(e.From.Nickname)))
+			{
+				if (e.From is IrcPeer)
+				{
+					this.Write("Notice", e.Message.Time, (IrcPeer)e.From, e.Text, false);
+				}
+				else if (this.IsServer)
+				{
+					this.Write("Notice", e.Message.Time, e.Text);
+				}
+			}
+			App.DoEvent("notice");
+		}
 
-            if (this.IsServer)
-            {
-                if (e.From is IrcPeer)
-                {
-                    this.Write("Notice", e.Message.Time, (IrcPeer)e.From, e.Text, false);
-                }
-                else if (this.IsServer)
-                {
-                    this.Write("Notice", e.Message.Time, e.Text);
-                }
-                App.DoEvent("notice");
-            }
-        }
-
-        private void Session_PrivateMessaged(object sender, IrcMessageEventArgs e)
+		private void Session_PrivateMessaged(object sender, IrcMessageEventArgs e)
         {
             if (App.IsIgnoreMatch(e.From, e.To.IsChannel ? IgnoreActions.Channel : IgnoreActions.Private))
             {
@@ -126,7 +126,7 @@ namespace Floe.UI
                         window.setOverlayIcon(OverlayIconState.ChatActivity);
                     }
 
-                    if (e.From.Prefix.Equals("*buffextras!buffextras@znc.in"))
+                    if (e.From != null && e.From.Prefix.Equals("*buffextras!buffextras@znc.in"))
                     {
                         int space = e.Text.IndexOf(' ');
                         String subject = e.Text.Substring(0, space);
@@ -395,9 +395,17 @@ namespace Floe.UI
             {
                 if (!isIgnored)
                 {
-                    this.Write("Part", e.Message.Time, string.Format("{0} ({1}@{2}) has left channel {3}",
-                        e.Who.Nickname, e.Who.Username, e.Who.Hostname, this.Target.ToString()));
-                }
+					if (string.IsNullOrEmpty(e.Text))
+					{
+						this.Write("Part", e.Message.Time, string.Format("{0} ({1}@{2}) has left channel {3}",
+							e.Who.Nickname, e.Who.Username, e.Who.Hostname, this.Target.ToString()));
+					}
+					else
+					{
+						this.Write("Part", e.Message.Time, string.Format("{0} ({1}@{2}) has left channel {3} ({4})",
+							e.Who.Nickname, e.Who.Username, e.Who.Hostname, this.Target.ToString(), e.Text));
+					}
+				}
                 _nickList.Remove(e.Who.Nickname);
             }
         }

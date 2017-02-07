@@ -470,6 +470,16 @@ namespace Floe.Net
 		}
 
 		/// <summary>
+		/// Part (leave) a channel with message.
+		/// </summary>
+		/// <param name="channel">The channel to leave.</param>
+		/// <param name="text"> The optional part message.</param>
+		public void Part(string channel, string text)
+		{
+			this.Send("PART", channel, text);
+		}
+
+		/// <summary>
 		/// Change the topic on a channel. The session must have the appropriate permissions on the channel.
 		/// </summary>
 		/// <param name="channel">The channel on which to set a new topic.</param>
