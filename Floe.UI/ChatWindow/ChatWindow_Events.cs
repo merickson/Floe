@@ -114,9 +114,9 @@ namespace Floe.UI
 				{
 					return;
 				}
-				if (!target.IsChannel && e.Message.From is IrcPeer)
+				if (!target.IsChannel/* && e.Message.From is IrcPeer*/)
 				{
-					if (App.Create(sender as IrcSession, new IrcTarget((IrcPeer)e.Message.From), false)
+					if (App.Create(sender as IrcSession, new IrcTarget(e.Message.From), false)
 						&& _notifyIcon != null && _notifyIcon.IsVisible)
 					{
 						_notifyIcon.Show("IRC Message", string.Format("You received a message from {0}.", ((IrcPeer)e.Message.From).Nickname));

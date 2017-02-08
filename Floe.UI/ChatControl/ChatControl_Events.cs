@@ -70,6 +70,10 @@ namespace Floe.UI
 				{
 					this.Write("Notice", e.Message.Time, (IrcPeer)e.From, e.Text, false);
 				}
+				else if (e.Message.From is IrcServer)
+				{
+					this.Write("Notice", e.Message.Time, (IrcServer)e.Message.From, e.Text, false);
+				}
 				else if (this.IsServer)
 				{
 					this.Write("Notice", e.Message.Time, e.Text);
@@ -88,7 +92,7 @@ namespace Floe.UI
             if (!this.IsServer)
             {
                 if ((this.Target.IsChannel && this.Target.Equals(e.To)) ||
-                    (!this.Target.IsChannel && this.Target.Equals(new IrcTarget(e.From)) && !e.To.IsChannel))
+                    (!this.Target.IsChannel && this.Target.Equals(new IrcTarget(e.Message.From)) && !e.To.IsChannel))
                 {
                     bool attn = false;
                     if (App.IsAttentionMatch(this.Session.Nickname, e.Text))
@@ -168,13 +172,13 @@ namespace Floe.UI
                     }
                     else
                     {
-                        this.Write("Default", e.Message.Time, e.From, e.Text, attn);
+                        this.Write("Default", e.Message.Time, e.Message.From, e.Text, attn);
 
                         if (!this.Target.IsChannel)
                         {
-                            if (e.From.Prefix != _prefix)
+                            if (e.Message.From.Prefix != _prefix)
                             {
-                                _prefix = e.From.Prefix;
+                                _prefix = e.Message.From.Prefix;
                                 this.SetTitle();
                             }
                             Interop.WindowHelper.FlashWindow(_window);

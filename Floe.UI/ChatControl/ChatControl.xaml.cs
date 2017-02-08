@@ -231,7 +231,25 @@ namespace Floe.UI
 			}
 		}
 
-        private void Write(string styleKey, IrcPeer peer, string text, bool attn)
+		private void Write(string styleKey, DateTime date, IrcServer peer, string text, bool attn)
+		{
+			this.Write(styleKey, date, string.Format("{0}", peer.ServerName).GetHashCode(),
+				this.GetNickWithLevel(peer.ServerName), text, attn);
+			if (!boxOutput.IsAutoScrolling)
+			{
+				App.DoEvent("beep");
+			}
+		}
+
+		private void Write(string styleKey, DateTime date, IrcPrefix peer, string text, bool attn)
+		{
+			if (peer is IrcPeer)
+				this.Write(styleKey, date, (IrcPeer)peer, text, attn);
+			if (peer is IrcServer)
+				this.Write(styleKey, date, (IrcServer)peer, text, attn);
+		}
+
+		private void Write(string styleKey, IrcPeer peer, string text, bool attn)
         {
             this.Write(styleKey, DateTime.Now, peer, text, attn);
         }

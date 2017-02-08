@@ -50,6 +50,33 @@ namespace Floe.Net
 		}
 
 		/// <summary>
+		/// Construct an IrcTarget from an IrcServer. This is useful when replying to a received message.
+		/// </summary>
+		/// <param name="peer"></param>
+		public IrcTarget(IrcServer peer)
+		{
+			this.IsChannel = false;
+			this.Name = peer.ServerName;
+		}
+
+		/// <summary>
+		/// Construct an IrcTarget from an IrcPrefix. This is useful when replying to a received message.
+		/// </summary>
+		/// <param name="peer"></param>
+		public IrcTarget(IrcPrefix peer)
+		{
+			this.IsChannel = false;
+			if (peer is IrcPeer)
+			{
+				this.Name = new IrcPeer(peer.Prefix.ToString()).Nickname;
+			}
+			if (peer is IrcServer)
+			{
+				this.Name = new IrcServer(peer.Prefix.ToString()).ServerName;
+			}
+		}
+
+		/// <summary>
 		/// Gets the name of the target.
 		/// </summary>
 		/// <returns>Returns the channel name or user name of the target.</returns>
