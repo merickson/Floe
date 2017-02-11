@@ -125,9 +125,11 @@
     <Compile Include="ChatBox\ClipboardHelper.cs" />
     <Compile Include="ChatBox\Constants.cs" />
     <Compile Include="ChatBox\Enums.cs" />
+    <Compile Include="ChatControl\ChanNameComplete.cs" />
     <Compile Include="ChatControl\ChatControl.xaml.cs">
       <DependentUpon>ChatControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ChatControl\ChatControl_ChannelList.cs" />
     <Compile Include="ChatControl\ChatControl_Commands.cs" />
     <Compile Include="ChatControl\ChatControl_Dcc.cs" />
     <Compile Include="ChatControl\ChatControl_Events.cs" />

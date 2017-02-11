@@ -891,7 +891,8 @@ namespace Floe.UI
                         {
                             tabHit = true;
                             DoNickCompletion();
-                        }
+							DoChannelCompletion();
+						}
                         break;
                     default:
                         Keyboard.Focus(txtInput);
@@ -902,7 +903,8 @@ namespace Floe.UI
                 if (tabHit != true)
                 {
                     _nicknameComplete = null;
-                }
+					_channameComplete = null;
+				}
             }
             else if (e.Key >= Key.A && e.Key <= Key.Z)
             {

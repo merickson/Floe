@@ -29,15 +29,23 @@ namespace Floe.UI
 
         private void DoNickCompletion()
         {
-            if(txtInput.CaretIndex == 0)
+            if (txtInput.CaretIndex == 0)
             {
                 return;
             }
 
-            if (_nicknameComplete == null)
-            {
-                _nicknameComplete = new NicknameComplete(txtInput, _nickList);
-            }
+			if (_nicknameComplete == null)
+			{
+				if (this.IsNickname)
+				{
+					NicknameList pnickList = new NicknameList();
+					pnickList.Add(this.Session.Nickname);
+					pnickList.Add(this.Target.Name);
+					_nicknameComplete = new NicknameComplete(txtInput, pnickList);
+				}
+				else
+					_nicknameComplete = new NicknameComplete(txtInput, _nickList);
+			}
 
             _nicknameComplete.getNextNick();
         }
