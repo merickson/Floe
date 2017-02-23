@@ -12,6 +12,7 @@ namespace Floe.UI
 {
 	public class NicknameList : KeyedCollection<string, NicknameItem>, INotifyCollectionChanged
 	{
+        public EventHandler NickListChanged;
 		public NicknameList()
 			: base(StringComparer.OrdinalIgnoreCase)
 		{
@@ -26,14 +27,16 @@ namespace Floe.UI
 			{
 				this.Add(item);
 			}
-		}
+            OnNickListChanged(this, null);
+        }
 
-		public void Add(string nick)
+        public void Add(string nick)
 		{
 			this.Add(new NicknameItem(nick));
-		}
+            OnNickListChanged(this, null);
+        }
 
-		public void ChangeNick(string oldNick, string newNick)
+        public void ChangeNick(string oldNick, string newNick)
 		{
 			var item = this[oldNick];
 			if (item != null)
@@ -117,7 +120,14 @@ namespace Floe.UI
 			if (handler != null)
 			{
 				handler(this, args);
+                OnNickListChanged(this, null);
 			}
 		}
+
+        protected virtual void OnNickListChanged(object source, EventArgs e)
+        {
+            if (NickListChanged != null)
+                NickListChanged(this, null);
+        }
 	}
 }

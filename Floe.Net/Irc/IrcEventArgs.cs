@@ -264,7 +264,7 @@ namespace Floe.Net
 		/// <summary>
 		/// Gets the user who performed the mode change.
 		/// </summary>
-		public IrcPeer Who { get; private set; }
+		public IrcPrefix Who { get; private set; }
 
 		/// <summary>
 		/// Gets the channel on which the modes were changed.
@@ -279,7 +279,7 @@ namespace Floe.Net
 		internal IrcChannelModeEventArgs(IrcMessage message)
 			: base(message)
 		{
-			this.Who = message.From as IrcPeer;
+			this.Who = message.From;
 			this.Channel = message.Parameters.Count > 0 ? new IrcTarget(message.Parameters[0]) : null;
 			this.Modes = message.Parameters.Count > 1 ? IrcChannelMode.ParseModes(message.Parameters.Skip(1)) : null;
 		}

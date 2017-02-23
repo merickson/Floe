@@ -5,6 +5,8 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using Floe.Net;
 using System.Windows.Documents;
+using System.Text;
+using System.Collections.Generic;
 
 namespace Floe.UI
 {
@@ -482,19 +484,17 @@ namespace Floe.UI
             {
                 if (e.Who != null)
                 {
-                    this.Write("Mode", e.Message.Time, string.Format("{0} sets mode: {1}", e.Who.Nickname,
-                        string.Join(" ", IrcChannelMode.RenderModes(e.Modes))));
-
-                    _channelModes = (from m in e.Modes.Where((newMode) => newMode.Parameter == null && newMode.Set).
-                                         Select((newMode) => newMode.Mode).Union(_channelModes).Distinct()
-                                     where !e.Modes.Any((newMode) => !newMode.Set && newMode.Mode == m)
-                                     select m).ToArray();
-                }
-                else
-                {
-                    _channelModes = (from m in e.Modes
-                                     where m.Set && m.Parameter == null
-                                     select m.Mode).ToArray();
+                    if (e.Who is IrcPeer)
+                    {
+                        this.Write("Mode", e.Message.Time, string.Format("{0} sets mode: {1}", new IrcPeer(e.Who.Prefix).Nickname,
+                            string.Join(" ", IrcChannelMode.RenderModes(e.Modes))));
+                    }
+                    if (e.Who is IrcServer)
+                    {
+                        this.Write("Mode", e.Message.Time, string.Format("{0} sets mode: {1}", new IrcServer(e.Who.Prefix).ServerName,
+                            string.Join(" ", IrcChannelMode.RenderModes(e.Modes))));
+                    }
+                    _channelModes = AssembleChannelModes(e).ToCharArray();
                 }
                 this.SetTitle();
                 foreach (var mode in e.Modes)
@@ -951,6 +951,8 @@ namespace Floe.UI
             DataObject.AddPastingHandler(txtInput, new DataObjectPastingEventHandler(txtInput_Pasting));
 
             this.IsConnected = !(this.Session.State == IrcSessionState.Disconnected);
+            if (_nickList != null)
+                _nickList.NickListChanged += OnNickListChanged;
         }
 
         private void UnsubscribeEvents()
@@ -978,6 +980,9 @@ namespace Floe.UI
             {
                 _window.Deactivated -= new EventHandler(_window_Deactivated);
             }
+
+            if (_nickList != null)
+                _nickList.NickListChanged -= OnNickListChanged;
         }
 
         private void PrepareContextMenus()
@@ -1028,6 +1033,105 @@ namespace Floe.UI
                 return "";
             }
             return new TimeSpan(0, 0, seconds).ToString();
+        }
+
+        public void OnNickListChanged(object source, EventArgs e)
+        {
+            this.SetTitle();
+        }
+
+        public string OrderChannelModes(string chanModes)
+        {
+            string resultModes = String.Empty;
+            if (chanModes.Contains('s'))
+                resultModes += 's';
+            if (chanModes.Contains('p'))
+                resultModes += 'p';
+            if (chanModes.Contains('m'))
+                resultModes += 'm';
+            if (chanModes.Contains('t'))
+                resultModes += 't';
+            if (chanModes.Contains('i'))
+                resultModes += 'i';
+            if (chanModes.Contains('n'))
+                resultModes += 'n';
+            if (chanModes.Contains('r'))
+                resultModes += 'r';
+            if (chanModes.Contains('D'))
+                resultModes += 'D';
+            if (chanModes.Contains('d'))
+                resultModes += 'd';
+            if (chanModes.Contains('R'))
+                resultModes += 'R';
+            if (chanModes.Contains('l'))
+                resultModes += 'l';
+            if (chanModes.Contains('k'))
+                resultModes += 'k';
+            if (string.IsNullOrWhiteSpace(resultModes) || string.IsNullOrEmpty(resultModes))
+                resultModes = chanModes;
+            return resultModes;
+        }
+
+        public string AssembleChannelModes(IrcChannelModeEventArgs chModes)
+        {
+            List<string> StrChanModes = new List<string>(new string(_channelModes).Split(' ').ToList());
+            string _chanModes = StrChanModes[0];
+            List<string> modeParam = new List<string>();
+            if (StrChanModes.Count > 1)
+                modeParam = StrChanModes.Skip(1).ToList();
+            StringBuilder sb = new StringBuilder();
+            sb.Append(_chanModes);
+            foreach (IrcChannelMode mode in chModes.Modes)
+            {
+                switch (mode.Mode)
+                {
+                    case 'O':
+                    case 'o':
+                    case 'v':
+                    case 'h':
+                    //case 'k':
+                    //case 'l':
+                    case 'b':
+                    case 'e':
+                    case 'I':
+                    case 'f':
+                    case 'j':
+                    case 'q':
+                        continue;
+                }
+                if (!_chanModes.Contains(mode.Mode) && mode.Set)
+                {
+                    sb.Append(mode.Mode);
+                    if (!string.IsNullOrWhiteSpace(mode.Parameter))
+                    {
+                        if (mode.Mode == 'l')
+                            modeParam.Insert(0, mode.Parameter);
+                        else
+                            modeParam.Add(mode.Parameter);
+                    }
+                }
+                else if (_chanModes.Contains(mode.Mode) && !mode.Set)
+                {
+                    sb.Remove(sb.ToString().IndexOf(mode.Mode), 1);
+                    if (modeParam.Count > 0)
+                    {
+                        if (mode.Mode == 'l')
+                            modeParam.RemoveAt(0);
+                        if (mode.Mode == 'k')
+                        {
+                            if (modeParam.Count > 1)
+                                modeParam.RemoveAt(1);
+                            else
+                                modeParam.RemoveAt(0);
+                        }
+                    }
+                }
+            }
+            sb = new StringBuilder(OrderChannelModes(sb.ToString()));
+            if (modeParam.Count > 0)
+                sb.Append(" ").Append(string.Join<string>(" ", modeParam));
+            _chanModes = sb.ToString();
+            return _chanModes;
         }
     }
 }

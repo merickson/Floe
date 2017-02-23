@@ -7,6 +7,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using Floe.Net;
 using System.Threading;
+using System.Text;
 
 namespace Floe.UI
 {
@@ -75,8 +76,11 @@ namespace Floe.UI
 							if (e.Message.Parameters.Count > 2 &&
 								this.Target.Equals(new IrcTarget(e.Message.Parameters[1])))
 							{
-								_channelModes = e.Message.Parameters[2].ToCharArray().Where((c) => c != '+').ToArray();
-								this.SetTitle();
+                                string _chModes = e.Message.Parameters[2];
+                                for (int i = 3; i < e.Message.Parameters.Count; i++)
+                                    _chModes += " " + e.Message.Parameters[i];
+                                _channelModes = _chModes.ToCharArray().Where((c) => c != '+').ToArray();
+                                this.SetTitle();
 							}
 							e.Handled = true;
 							return true;
@@ -298,8 +302,8 @@ namespace Floe.UI
 				default:
 					if (this.Target.IsChannel)
 					{
-						this.Title = string.Format("{0} - {1} ({2}) on {3} - {4} ({5}) - {6}", App.Product, this.Session.Nickname,
-							userModes, this.Session.NetworkName, this.Target.ToString(), channelModes, _topic);
+						this.Title = string.Format("{0} - {1} ({2}) on {3} - {4} ({5}) ({6}) - {7}", App.Product, this.Session.Nickname,
+							userModes, this.Session.NetworkName, this.Target.ToString(), _nickList.Count, channelModes, _topic);
 					}
 					else
 					{
