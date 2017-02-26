@@ -25,7 +25,6 @@ namespace Floe.UI
 			{
 				_chanCandidates = (from n in chanCandidates
 								   where n.StartsWith(_incompleteChan, StringComparison.InvariantCultureIgnoreCase)
-								   orderby n.ToLowerInvariant()
 								   select n).ToArray();
 			}
 		}
