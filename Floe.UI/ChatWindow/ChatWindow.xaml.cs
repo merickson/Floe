@@ -22,6 +22,19 @@ namespace Floe.UI
 
 			this.Loaded += new RoutedEventHandler(ChatWindow_Loaded);
 			chatTreeView.ItemsSource = NetworkTreeViewList;
+			chatTreeView.SelectedItemChanged += ChatTreeView_SelectedItemChanged;
+		}
+
+		private void ChatTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+		{
+			if (e.NewValue is NetworkTreeViewItem)
+			{
+				SwitchToPage(((NetworkTreeViewItem)e.NewValue).Page);
+			}
+			if (e.NewValue is ChannelTreeViewItem)
+			{
+				SwitchToPage(((ChannelTreeViewItem)e.NewValue).Page);
+			}
 		}
 
 		public void AddPage(ChatPage page, bool switchToPage)
@@ -87,7 +100,15 @@ namespace Floe.UI
 
 		public void SwitchToPage(ChatPage page)
 		{
-			var index = this.Items.Where((tab) => tab.Page == page).Select((t,i) => i).FirstOrDefault();
+			var index = this.Items.Where((tab) => tab.Page == page).Select((t, i) => i).FirstOrDefault();
+			if (index == 0)
+			{
+				foreach (var tbItem in this.Items)
+				{
+					if (tbItem.Page.Session == page.Session && tbItem.Page.Target == page.Target)
+						index = this.Items.IndexOf(tbItem);
+				}
+			}
 			tabsChat.SelectedIndex = index;
 		}
 
