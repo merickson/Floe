@@ -165,7 +165,7 @@
 					</Style>
 				</TreeView.ItemContainerStyle>
 				<TreeView.Resources>
-					<HierarchicalDataTemplate DataType="{x:Type local:NetworkTreeViewItem}" ItemsSource="{Binding ChannelItems}">
+					<HierarchicalDataTemplate DataType="{x:Type local:NetworkTreeViewItem}" ItemsSource="{Binding ChannelItems, UpdateSourceTrigger=PropertyChanged}">
 						<TextBlock Text="{Binding NetworkName}" />
 					</HierarchicalDataTemplate>
 					<DataTemplate DataType="{x:Type local:ChannelTreeViewItem}" >
