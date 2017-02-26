@@ -3,7 +3,6 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-
 using Floe.Net;
 
 namespace Floe.UI
@@ -11,15 +10,18 @@ namespace Floe.UI
 	public partial class ChatWindow : Window
 	{
 		public ObservableCollection<ChatTabItem> Items { get; private set; }
+		public ObservableCollection<NetworkTreeViewItem> NetworkTreeViewList;
 		public ChatControl ActiveControl { get { return tabsChat.SelectedContent as ChatControl; } }
 
 		public ChatWindow()
 		{
 			this.Items = new ObservableCollection<ChatTabItem>();
+			this.NetworkTreeViewList = new ObservableCollection<NetworkTreeViewItem>();
 			this.DataContext = this;
 			InitializeComponent();
 
 			this.Loaded += new RoutedEventHandler(ChatWindow_Loaded);
+			chatTreeView.ItemsSource = NetworkTreeViewList;
 		}
 
 		public void AddPage(ChatPage page, bool switchToPage)
@@ -30,6 +32,7 @@ namespace Floe.UI
 			{
 				this.Items.Add(item);
 				this.SubscribeEvents(page.Session);
+				this.NetworkTreeViewList.Add(new NetworkTreeViewItem(item.Page));
 			}
 			else
 			{
@@ -38,6 +41,14 @@ namespace Floe.UI
 					if (this.Items[i].Page.Session == page.Session)
 					{
 						this.Items.Insert(i + 1, item);
+						break;
+					}
+				}
+				for (int i = this.NetworkTreeViewList.Count - 1; i >= 0; --i)
+				{
+					if (this.NetworkTreeViewList[i].Page.Session == page.Session)
+					{
+						this.NetworkTreeViewList[i].ChannelItems.Add(new ChannelTreeViewItem(item.Page));
 						break;
 					}
 				}
@@ -61,6 +72,17 @@ namespace Floe.UI
 			}
 			page.Dispose();
 			this.Items.Remove(this.Items.Where((i) => i.Page == page).FirstOrDefault());
+			if (page.Type == ChatPageType.Server)
+			{
+				this.NetworkTreeViewList.Remove(NetworkTreeViewList.Where(tr => tr.Page == page).FirstOrDefault());
+			}
+			else
+			{
+				foreach (var nitem in this.NetworkTreeViewList)
+				{
+					nitem.ChannelItems.Remove(nitem.ChannelItems.Where(c => c.Page == page).FirstOrDefault());
+				}
+			}
 		}
 
 		public void SwitchToPage(ChatPage page)
