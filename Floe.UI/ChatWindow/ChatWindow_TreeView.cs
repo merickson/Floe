@@ -49,7 +49,6 @@ namespace Floe.UI
 				handler(this, new PropertyChangedEventArgs(name));
 			}
 		}
-
 	}
 
 	public class ChannelTreeViewItem

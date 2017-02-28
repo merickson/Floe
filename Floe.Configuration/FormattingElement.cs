@@ -65,14 +65,14 @@ namespace Floe.Configuration
 			}
 		}
 
-		[ConfigurationProperty("useTabularView", DefaultValue=true)]
+		[ConfigurationProperty("useTabularView", DefaultValue=false)]
 		public bool UseTabularView
 		{
 			get { return (bool)this["useTabularView"]; }
 			set { this["useTabularView"] = value; this.OnPropertyChanged("UseTabularView"); }
 		}
 
-		[ConfigurationProperty("colorizeNicknames", DefaultValue = true)]
+		[ConfigurationProperty("colorizeNicknames", DefaultValue = false)]
 		public bool ColorizeNicknames
 		{
 			get { return (bool)this["colorizeNicknames"]; }
@@ -86,26 +86,26 @@ namespace Floe.Configuration
 			set { this["nicknameColorSeed"] = value; this.OnPropertyChanged("NicknameColorSeed"); }
 		}
 
-		[ConfigurationProperty("attentionOnOwnNickname", DefaultValue = false)]
+		[ConfigurationProperty("attentionOnOwnNickname", DefaultValue = true)]
 		public bool AttentionOnOwnNickname
 		{
 			get { return (bool)this["attentionOnOwnNickname"]; }
 			set { this["attentionOnOwnNickname"] = value; this.OnPropertyChanged("AttentionOnOwnNickname"); }
 		}
 
-        [ConfigurationProperty("overlayIconOnChatActivity", DefaultValue = false)]
-        public bool OverlayIconOnChatActivity
-        {
-            get { return (bool)this["overlayIconOnChatActivity"]; }
-            set { this["overlayIconOnChatActivity"] = value; this.OnPropertyChanged("OverlayIconOnChatActivity"); }
-        }
+		[ConfigurationProperty("overlayIconOnChatActivity", DefaultValue = false)]
+		public bool OverlayIconOnChatActivity
+		{
+			get { return (bool)this["overlayIconOnChatActivity"]; }
+			set { this["overlayIconOnChatActivity"] = value; this.OnPropertyChanged("OverlayIconOnChatActivity"); }
+		}
 
-        [ConfigurationProperty("overlayIconChangeColor", DefaultValue = false)]
-        public bool OverlayIconChangeColor
-        {
-            get { return (bool)this["overlayIconChangeColor"]; }
-            set { this["overlayIconChangeColor"] = value; this.OnPropertyChanged("OverlayIconChangeColor"); }
-        }
+		[ConfigurationProperty("overlayIconChangeColor", DefaultValue = false)]
+		public bool OverlayIconChangeColor
+		{
+			get { return (bool)this["overlayIconChangeColor"]; }
+			set { this["overlayIconChangeColor"] = value; this.OnPropertyChanged("OverlayIconChangeColor"); }
+		}
 
 		[ConfigurationProperty("attentionPatterns", DefaultValue = "")]
 		public string AttentionPatterns

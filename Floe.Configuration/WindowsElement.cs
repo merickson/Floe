@@ -41,7 +41,7 @@ namespace Floe.Configuration
 			set { this["chromeOpacity"] = value; this.OnPropertyChanged("ChromeOpacity"); }
 		}
 
-		[ConfigurationProperty("backgroundOpacity", DefaultValue = 0.92)]
+		[ConfigurationProperty("backgroundOpacity", DefaultValue = 1.0)]
 		public double BackgroundOpacity
 		{
 			get { return (double)this["backgroundOpacity"]; }
@@ -55,7 +55,7 @@ namespace Floe.Configuration
 			set { this["minimizeToSysTray"] = value; this.OnPropertyChanged("MinimizeToSysTray"); }
 		}
 
-		[ConfigurationProperty("tabStripPosition", DefaultValue=TabStripPosition.Bottom)]
+		[ConfigurationProperty("tabStripPosition", DefaultValue=TabStripPosition.Top)]
 		public TabStripPosition TabStripPosition
 		{
 			get { return (TabStripPosition)this["tabStripPosition"]; }
