@@ -357,10 +357,14 @@ namespace Floe.UI
 
 			switch (command)
 			{
-                case "QUOTE":
-                    args = Split(command, arguments, 1, 1);
-                    this.Session.Quote(args[0]);
-                    break;
+				case "QUOTE":
+					args = Split(command, arguments, 1, 1);
+					this.Session.Quote(args[0]);
+					break;
+				case "OPER":
+					args = Split(command, arguments, 1, 2);
+					this.Session.Oper(args);
+					break;
 				case "QUIT":
 					args = Split(command, arguments, 0, 1);
 					this.Session.AutoReconnect = false;
