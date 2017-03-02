@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using Floe.Net;
 
 namespace Floe.UI
@@ -151,6 +152,12 @@ namespace Floe.UI
 					i.Page.Session.Quit("Leaving");
 				}
 			}
+		}
+
+		private void Border_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+		{
+			if (e.ChangedButton == MouseButton.Left)
+				this.DragMove();
 		}
 	}
 }
