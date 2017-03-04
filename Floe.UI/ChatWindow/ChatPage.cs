@@ -59,11 +59,33 @@ namespace Floe.UI
 		}
 
 		public static readonly DependencyProperty NotifyStateProperty =
-			DependencyProperty.Register("NotifyState", typeof(NotifyState), typeof(ChatPage));
+			DependencyProperty.Register("NotifyState", typeof(NotifyState), typeof(ChatPage),
+				new PropertyMetadata(OnNotifyStateChangedCallBack));
 		public NotifyState NotifyState
 		{
 			get { return (NotifyState)this.GetValue(NotifyStateProperty); }
 			set { this.SetValue(NotifyStateProperty, value); }
+		}
+
+		private static void OnNotifyStateChangedCallBack(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+		{
+			ChatPage senderPage = sender as ChatPage;
+			var window = Window.GetWindow(senderPage);
+			if (window is ChatWindow)
+			{
+				ChatWindow chatwindow = (ChatWindow)window;
+				var treeItem = chatwindow.FindTreeViewItem(senderPage);
+				if (treeItem is NetworkTreeViewItem)
+				{
+					NetworkTreeViewItem ntreeItem = (NetworkTreeViewItem)treeItem;
+					ntreeItem.OnNotifyStateChanged();
+				}
+				if (treeItem is ChannelTreeViewItem)
+				{
+					ChannelTreeViewItem ctreeItem = (ChannelTreeViewItem)treeItem;
+					ctreeItem.OnNotifyStateChanged();
+				}
+			}
 		}
 
 		public static readonly DependencyProperty IsCloseableProperty =

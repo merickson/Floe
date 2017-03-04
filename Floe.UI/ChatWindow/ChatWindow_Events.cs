@@ -122,11 +122,11 @@ namespace Floe.UI
 						_notifyIcon.Show("IRC Message", string.Format("You received a message from {0}.", ((IrcPeer)e.Message.From).Nickname));
 					}
 				}
-                else if (_notifyIcon != null && _notifyIcon.IsVisible && e.Message.From is IrcPeer)
-                {
-                    var title = String.Format("{0} : {1}", e.Message.Parameters[0], ((IrcPeer)e.Message.From).Nickname);
-                    _notifyIcon.Show(title, e.Message.Parameters[1]);
-                }
+				else if (_notifyIcon != null && _notifyIcon.IsVisible && e.Message.From is IrcPeer)
+				{
+					var title = String.Format("{0} : {1}", e.Message.Parameters[0], ((IrcPeer)e.Message.From).Nickname);
+					_notifyIcon.Show(title, e.Message.Parameters[1]);
+				}
 			}
 		}
 

@@ -166,11 +166,14 @@
 				</TreeView.ItemContainerStyle>
 				<TreeView.Resources>
 					<HierarchicalDataTemplate DataType="{x:Type local:NetworkTreeViewItem}" ItemsSource="{Binding ChannelItems, UpdateSourceTrigger=PropertyChanged}">
-						<TextBlock Text="{Binding NetworkName}" />
+						<TextBlock Text="{Binding NetworkName}" Foreground="{Binding ActivityColor, UpdateSourceTrigger=PropertyChanged}"/>
 					</HierarchicalDataTemplate>
 					<DataTemplate DataType="{x:Type local:ChannelTreeViewItem}" >
-						<TextBlock Text="{Binding Path=ChannelName}" />
+						<TextBlock Text="{Binding ChannelName}" Foreground="{Binding ActivityColor, UpdateSourceTrigger=PropertyChanged}"/>
 					</DataTemplate>
+					<Style TargetType="{x:Type TreeViewItem}">
+						<Setter Property="IsSelected" Value="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+					</Style>
 				</TreeView.Resources>                   
 			</TreeView>
 
