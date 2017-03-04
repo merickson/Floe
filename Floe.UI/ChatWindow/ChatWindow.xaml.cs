@@ -30,12 +30,21 @@ namespace Floe.UI
 
 		private void TabsChat_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
+			return;
+
+			/* TODO: 
+			 * Disabled because very much seems like TabsChat_SelectionChanged and ChatTreeView_SelectedItemChanged calls each other in an endless loop.
+			 */
 			ChatTabItem oldTabItem = null;
 			ChatTabItem newTabItem = null;
-			if (e.RemovedItems.Count > 0)
+			if ((e.RemovedItems.Count > 0) && (e.RemovedItems[0] is ChatTabItem))
 				oldTabItem = (ChatTabItem)e.RemovedItems[0];
-			if (e.AddedItems.Count > 0)
+			else
+				return;
+			if ((e.AddedItems.Count > 0) && (e.AddedItems[0] is ChatTabItem))
 				newTabItem = (ChatTabItem)e.AddedItems[0];
+			else
+				return;
 			if (oldTabItem != null && newTabItem != null)
 			{
 				if (newTabItem.Page.Type == ChatPageType.Server)
