@@ -149,6 +149,12 @@ namespace Floe.UI
 				{
 					if (this.Items[i].Page.Session == page.Session)
 					{
+						if ((page.Target.IsChannel)
+							&& ((this.Items[i].Page.Target != null) && (this.Items[i].Page.Target.IsChannel == false))
+							&& (i < (this.Items.Count - 1)))
+						{
+							continue;
+						}
 						this.Items.Insert(i + 1, item);
 						break;
 					}
@@ -157,8 +163,48 @@ namespace Floe.UI
 				{
 					if (this.NetworkTreeViewList[i].Page.Session == page.Session)
 					{
-						this.NetworkTreeViewList[i].ChannelItems.Add(new ChannelTreeViewItem(item.Page));
-						break;
+						for (int j = 0; j <= this.NetworkTreeViewList[i].ChannelItems.Count; j++)
+						{
+							if (this.NetworkTreeViewList[i].ChannelItems.Count == 0)
+							{
+								this.NetworkTreeViewList[i].ChannelItems.Add(new ChannelTreeViewItem(item.Page));
+								break;
+							}
+							if (j == this.NetworkTreeViewList[i].ChannelItems.Count - 1)
+							{
+								if (page.Target.IsChannel)
+								{
+									if (this.NetworkTreeViewList[i].ChannelItems[j].Page.Target.IsChannel)
+									{
+										this.NetworkTreeViewList[i].ChannelItems.Add(new ChannelTreeViewItem(item.Page));
+										break;
+									}
+									else
+									{
+										this.NetworkTreeViewList[i].ChannelItems.Insert(j, new ChannelTreeViewItem(item.Page));
+										break;
+									}
+								}
+								else
+								{
+									this.NetworkTreeViewList[i].ChannelItems.Add(new ChannelTreeViewItem(item.Page));
+									break;
+								}
+							}
+							if (!this.NetworkTreeViewList[i].ChannelItems[j].Page.Target.IsChannel)
+							{
+								if (page.Target.IsChannel)
+								{
+									this.NetworkTreeViewList[i].ChannelItems.Insert(j, new ChannelTreeViewItem(item.Page));
+									break;
+								}
+								else
+								{
+									this.NetworkTreeViewList[i].ChannelItems.Add(new ChannelTreeViewItem(item.Page));
+									break;
+								}
+							}
+						}
 					}
 				}
 			}
