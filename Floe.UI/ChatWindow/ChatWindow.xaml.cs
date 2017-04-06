@@ -86,20 +86,13 @@ namespace Floe.UI
 				if (Item is ChannelTreeViewItem)
 				{
 					ChannelTreeViewItem cItem = Item as ChannelTreeViewItem;
-					if (cItem.ChannelName.Equals(Header))
+					var tvItem = chatTreeView.ItemContainerGenerator.ContainerFromItem(cItem) as TreeViewItem;
+					if (tvItem != null)
 					{
-						foreach (var tItem in chatTreeView.Items)
+						if (cItem.ChannelName.Equals(Header))
 						{
-							TreeViewItem TV = tItem as TreeViewItem;
-							if (TV != null)
-							{
-								var tvItem = TV.ItemContainerGenerator.ContainerFromItem(cItem) as TreeViewItem;
-								if (tvItem != null)
-								{
-									tvItem.IsSelected = true;
-									return;
-								}
-							}
+							tvItem.IsSelected = true;
+							return;
 						}
 					}
 				}
@@ -121,7 +114,6 @@ namespace Floe.UI
 			}
 			if (e.NewValue is ChannelTreeViewItem)
 			{
-				//SwitchToPage(((ChannelTreeViewItem)e.NewValue).Page);
 				ChannelTreeViewItem newItem = (ChannelTreeViewItem)e.NewValue;
 				newItem.IsSelected = true;
 				SwitchToPage(newItem.Page);
