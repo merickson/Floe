@@ -1047,8 +1047,10 @@ namespace Floe.Net
 					// We don't really even need to do anything about "ACK" but we might want to handle "NAK"
 					// in case ZNC 1.5 or whatever drops znc.in/server-time-iso in favor of server-time...
 					case "LS":      // Server listed capabilities. END or REQ.
+						_conn.QueueMessage(new IrcMessage("CAP REQ", message.Parameters.Skip(2).ToArray()));
 						break;
 					case "ACK":     // Server acknowledged. Turn it on.
+						_conn.QueueMessage(new IrcMessage("CAP", "END"));
 						break;
 					case "NAK":     // Server rejected. Turn it off.
 						break;
@@ -1126,7 +1128,7 @@ namespace Floe.Net
 				.Where((ip) => ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork).FirstOrDefault();
 
 			// IRCv3 Client Capability Negotiation
-			//_conn.QueueMessage(new IrcMessage("CAP", "LS"));
+			_conn.QueueMessage(new IrcMessage("CAP", "LS"));
 			// NEGOTIATION? I MEANT A ONE-SIDED DEMAND.
 			_conn.QueueMessage(new IrcMessage("CAP", "REQ", "znc.in/server-time-iso"));
 
