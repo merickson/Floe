@@ -22,7 +22,7 @@ namespace Floe.Configuration
 			set { this["editBackground"] = value; OnPropertyChanged("EditBackground"); }
 		}
 
-		[ConfigurationProperty("edit", DefaultValue = "#FFC0C0C0")]
+		[ConfigurationProperty("edit", DefaultValue = "Black")]
 		public string Edit
 		{
 			get { return (string)this["edit"]; }
