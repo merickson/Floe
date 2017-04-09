@@ -66,6 +66,10 @@ namespace Floe.UI
             while ( c != ' ' && i > 0)
             {
                 c = _txtInput.Text[--i];
+                if ((c == '=') && (_txtInput.Text[i - 1] == ' '))
+                {
+                    break;
+                }
             }
             if (i == 0)
             {
