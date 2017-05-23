@@ -13,6 +13,7 @@ namespace Floe.UI
 	{
 		public ObservableCollection<ChatTabItem> Items { get; private set; }
 		public ObservableCollection<NetworkTreeViewItem> NetworkTreeViewList;
+
 		public ChatControl ActiveControl { get { return tabsChat.SelectedContent as ChatControl; } }
 
 		public ChatWindow()
@@ -30,11 +31,6 @@ namespace Floe.UI
 
 		private void TabsChat_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
-			return;
-
-			/* TODO: 
-			 * Disabled because very much seems like TabsChat_SelectionChanged and ChatTreeView_SelectedItemChanged calls each other in an endless loop.
-			 */
 			ChatTabItem oldTabItem = null;
 			ChatTabItem newTabItem = null;
 			if ((e.RemovedItems.Count > 0) && (e.RemovedItems[0] is ChatTabItem))
@@ -47,54 +43,16 @@ namespace Floe.UI
 				return;
 			if (oldTabItem != null && newTabItem != null)
 			{
-				if (newTabItem.Page.Type == ChatPageType.Server)
+				var newTreeViewItemSelection = FindTreeViewItem(newTabItem.Page);
+				if (newTreeViewItemSelection is NetworkTreeViewItem)
 				{
-					NetworkTreeViewItem newNetworkItem = this.NetworkTreeViewList.Where((tr) => tr.Page == newTabItem.Page).FirstOrDefault();
-					SelectTreeViewItem(chatTreeView.Items, newNetworkItem.NetworkName);
+					NetworkTreeViewItem nItem = newTreeViewItemSelection as NetworkTreeViewItem;
+					nItem.IsSelected = true;
 				}
-				else
+				if (newTreeViewItemSelection is ChannelTreeViewItem)
 				{
-					var newChanItem = FindTreeViewItem(newTabItem.Page);
-					if (newChanItem is ChannelTreeViewItem)
-					{
-						ChannelTreeViewItem cItem = newChanItem as ChannelTreeViewItem;
-						SelectTreeViewItem(chatTreeView.Items, cItem.ChannelName);
-					}
-				}
-			}
-		}
-
-		private void SelectTreeViewItem(ItemCollection Collection, String Header)
-		{
-			if (Collection == null) return;
-			foreach (var Item in Collection)
-			{
-				if (Item is NetworkTreeViewItem)
-				{
-					NetworkTreeViewItem nItem = Item as NetworkTreeViewItem;
-					var tvItem = chatTreeView.ItemContainerGenerator.ContainerFromItem(nItem) as TreeViewItem;
-					if (tvItem != null)
-					{
-						if (nItem.NetworkName.Equals(Header))
-						{
-							tvItem.IsSelected = true;
-							return;
-						}
-						SelectTreeViewItem(tvItem.Items, Header);
-					}
-				}
-				if (Item is ChannelTreeViewItem)
-				{
-					ChannelTreeViewItem cItem = Item as ChannelTreeViewItem;
-					var tvItem = chatTreeView.ItemContainerGenerator.ContainerFromItem(cItem) as TreeViewItem;
-					if (tvItem != null)
-					{
-						if (cItem.ChannelName.Equals(Header))
-						{
-							tvItem.IsSelected = true;
-							return;
-						}
-					}
+					ChannelTreeViewItem cItem = newTreeViewItemSelection as ChannelTreeViewItem;
+					cItem.IsSelected = true;
 				}
 			}
 		}
