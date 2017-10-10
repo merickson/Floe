@@ -558,7 +558,7 @@ namespace Floe.UI
 					if (this.IsConnected)
 					{
 						args = Split(command, arguments, 1, int.MaxValue);
-						this.Write("Own", string.Format("{0} {1}", this.Session.Nickname, string.Join(" ", args)));
+						this.Write("Action", string.Format("{0} {1}", this.Session.Nickname, string.Join(" ", args)));
 						if (this.Type == ChatPageType.Chat)
 						{
 							this.Session.SendCtcp(this.Target, new CtcpCommand("ACTION", args), false);
