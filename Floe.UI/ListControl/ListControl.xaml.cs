@@ -81,7 +81,7 @@ namespace Floe.UI
 				case IrcCode.RPL_LISTEND:
 					this.IsCloseable = true;
 					this.Session.InfoReceived -= new EventHandler<IrcInfoEventArgs>(Session_InfoReceived);
-					_channels.Sort();
+                    _channels = _channels.OrderByDescending(c => c.Count).ToList();
 					foreach (var c in _channels)
 					{
 						lstChannels.Items.Add(c);

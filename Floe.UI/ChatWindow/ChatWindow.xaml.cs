@@ -35,13 +35,23 @@ namespace Floe.UI
 			ChatTabItem newTabItem = null;
 			if ((e.RemovedItems.Count > 0) && (e.RemovedItems[0] is ChatTabItem))
 				oldTabItem = (ChatTabItem)e.RemovedItems[0];
-			else
-				return;
 			if ((e.AddedItems.Count > 0) && (e.AddedItems[0] is ChatTabItem))
 				newTabItem = (ChatTabItem)e.AddedItems[0];
-			else
-				return;
-			if (oldTabItem != null && newTabItem != null)
+            if (oldTabItem != null)
+            {
+                var newTreeViewItemSelection = FindTreeViewItem(oldTabItem.Page);
+                if (newTreeViewItemSelection is NetworkTreeViewItem)
+                {
+                    NetworkTreeViewItem nItem = newTreeViewItemSelection as NetworkTreeViewItem;
+                    nItem.IsSelected = false;
+                }
+                if (newTreeViewItemSelection is ChannelTreeViewItem)
+                {
+                    ChannelTreeViewItem cItem = newTreeViewItemSelection as ChannelTreeViewItem;
+                    cItem.IsSelected = false;
+                }
+            }
+            if (newTabItem != null)
 			{
 				var newTreeViewItemSelection = FindTreeViewItem(newTabItem.Page);
 				if (newTreeViewItemSelection is NetworkTreeViewItem)
@@ -99,7 +109,7 @@ namespace Floe.UI
 				{
 					if (this.Items[i].Page.Session == page.Session)
 					{
-						if ((page.Target.IsChannel)
+						if (((page.Target != null) && (page.Target.IsChannel))
 							&& ((this.Items[i].Page.Target != null) && (this.Items[i].Page.Target.IsChannel == false))
 							&& (i < (this.Items.Count - 1)))
 						{
@@ -122,7 +132,7 @@ namespace Floe.UI
 							}
 							if (j == this.NetworkTreeViewList[i].ChannelItems.Count - 1)
 							{
-								if (page.Target.IsChannel)
+								if (page.Target != null && page.Target.IsChannel)
 								{
 									if (this.NetworkTreeViewList[i].ChannelItems[j].Page.Target.IsChannel)
 									{
@@ -143,7 +153,7 @@ namespace Floe.UI
 							}
 							if (!this.NetworkTreeViewList[i].ChannelItems[j].Page.Target.IsChannel)
 							{
-								if (page.Target.IsChannel)
+								if (page.Target != null && page.Target.IsChannel)
 								{
 									this.NetworkTreeViewList[i].ChannelItems.Insert(j, new ChannelTreeViewItem(item.Page));
 									break;
