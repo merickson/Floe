@@ -134,7 +134,7 @@ namespace Floe.UI
 							{
 								if (page.Target != null && page.Target.IsChannel)
 								{
-									if (this.NetworkTreeViewList[i].ChannelItems[j].Page.Target.IsChannel)
+									if ((this.NetworkTreeViewList[i].ChannelItems[j].Page.Target != null) && (this.NetworkTreeViewList[i].ChannelItems[j].Page.Target.IsChannel))
 									{
 										this.NetworkTreeViewList[i].ChannelItems.Add(new ChannelTreeViewItem(item.Page));
 										break;
@@ -207,7 +207,7 @@ namespace Floe.UI
 			{
 				foreach (var tbItem in this.Items)
 				{
-					if (tbItem.Page.Session == page.Session && tbItem.Page.Target == page.Target)
+					if ((tbItem.Page.Session == page.Session) && (tbItem.Page.Type == page.Type) && (tbItem.Page.Target == page.Target))
 						index = this.Items.IndexOf(tbItem);
 				}
 			}
