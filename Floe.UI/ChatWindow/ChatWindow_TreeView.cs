@@ -93,23 +93,23 @@ namespace Floe.UI
 	{
 		public ChatPage Page { get; private set; }
 		public string ChannelName
-        {
-            get
-            {
-                if (Page.Target != null)
-                    return Page.Target.Name;
+		{
+			get
+			{
+				if (Page.Target != null)
+					return Page.Target.Name;
 
-                if (Page.Type == ChatPageType.ChannelList)
-                    return "Channel List";
+				if (Page.Type == ChatPageType.ChannelList)
+					return "Channel List";
 
-                if (Page.Type == ChatPageType.Debug)
-                    return Page.Id;
+				if (Page.Type == ChatPageType.Debug)
+					return Page.Id;
 
-                return "Unknown ChatPageType";
-            }
+				return "Unknown ChatPageType";
+			}
         }
 
-        public ContextMenu CloseMenu { get; private set; }
+		public ContextMenu CloseMenu { get; private set; }
 
 		private string _activityColor;
 		public string ActivityColor
@@ -140,13 +140,13 @@ namespace Floe.UI
 		{
 			this.ActivityColor = "Black";
 			this.Page = page;
-            this.Page.IsCloseable = true;
-            CloseMenu = new ContextMenu();
-            MenuItem CloseItem = new MenuItem();
-            CloseItem.Command = ChatWindow.CloseTabCommand;
-            CloseItem.CommandParameter = this.Page;
-            CloseMenu.Items.Add(CloseItem);
-        }
+			this.Page.IsCloseable = true;
+			CloseMenu = new ContextMenu();
+			MenuItem CloseItem = new MenuItem();
+			CloseItem.Command = ChatWindow.CloseTabCommand;
+			CloseItem.CommandParameter = this.Page;
+			CloseMenu.Items.Add(CloseItem);
+		}
 
         public void OnNotifyStateChanged()
 		{

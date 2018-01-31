@@ -357,13 +357,13 @@ namespace Floe.UI
 
 			switch (command)
 			{
-                case "DEBUG":
-                    args = Split(command, arguments, 0, 1);
-                    if (args.Length == 1)
-                        App.Create(this.Session, new DebugControl.DebugControl(this.Session, args[0]), true);
-                    else
-                        App.ChatWindow.AddPage(new DebugControl.DebugControl(this.Session), true);
-                    break;
+				case "DEBUG":
+					args = Split(command, arguments, 0, 1);
+					if (args.Length == 1)
+						App.Create(this.Session, new DebugControl.DebugControl(this.Session, args[0]), true);
+					else
+						App.ChatWindow.AddPage(new DebugControl.DebugControl(this.Session), true);
+					break;
                 case "QUOTE":
 					args = Split(command, arguments, 1, 1);
 					this.Session.Quote(args[0]);

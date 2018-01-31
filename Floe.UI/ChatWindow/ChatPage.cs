@@ -14,7 +14,7 @@ namespace Floe.UI
 		DccFile,
 		DccChat,
 		ChannelList,
-        Debug
+		Debug
 	}
 
 	public class ChatPage : UserControl, IDisposable
