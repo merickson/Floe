@@ -107,7 +107,7 @@ namespace Floe.UI
 
 				return "Unknown ChatPageType";
 			}
-        }
+		}
 
 		public ContextMenu CloseMenu { get; private set; }
 
@@ -148,7 +148,7 @@ namespace Floe.UI
 			CloseMenu.Items.Add(CloseItem);
 		}
 
-        public void OnNotifyStateChanged()
+		public void OnNotifyStateChanged()
 		{
 			if (Page.NotifyState == NotifyState.None)
 				ActivityColor = "Black";
