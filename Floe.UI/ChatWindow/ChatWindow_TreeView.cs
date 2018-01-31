@@ -92,7 +92,22 @@ namespace Floe.UI
 	public class ChannelTreeViewItem : INotifyPropertyChanged
 	{
 		public ChatPage Page { get; private set; }
-		public string ChannelName { get { return Page.Target != null ? Page.Target.Name : "Channel List"; } }
+		public string ChannelName
+        {
+            get
+            {
+                if (Page.Target != null)
+                    return Page.Target.Name;
+
+                if (Page.Type == ChatPageType.ChannelList)
+                    return "Channel List";
+
+                if (Page.Type == ChatPageType.Debug)
+                    return Page.Id;
+
+                return "Unknown ChatPageType";
+            }
+        }
 
         public ContextMenu CloseMenu { get; private set; }
 

@@ -27,3 +27,6 @@ obj/
 [Rr]elease*/
 _ReSharper*/
 [Tt]est[Rr]esult*
+#Don't ignore DebugControl UI Control
+!Floe.UI/DebugControl/
+!Floe.UI/DebugControl/*
