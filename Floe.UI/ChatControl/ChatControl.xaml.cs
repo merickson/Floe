@@ -290,7 +290,7 @@ namespace Floe.UI
 				case ChatPageType.Server:
 					if (this.Session.State == IrcSessionState.Disconnected)
 					{
-						this.Title = string.Format("{0} - Not Connected", App.Product);
+						this.Title = string.Format("{0} - {1} - Not Connected", App.Product, this.Session.Nickname);
 					}
 					else
 					{

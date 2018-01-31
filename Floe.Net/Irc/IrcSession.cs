@@ -238,9 +238,10 @@ namespace Floe.Net
 		/// <summary>
 		/// Default constructor.
 		/// </summary>
-		public IrcSession()
+		public IrcSession(string nickName = null)
 		{
 			this.State = IrcSessionState.Disconnected;
+            this.Nickname = nickName;
 			this.UserModes = new char[0];
 			_syncContext = SynchronizationContext.Current;
 

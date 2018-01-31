@@ -373,7 +373,10 @@ namespace Floe.UI
 				case "NICK":
 					args = Split(command, arguments, 1, 1);
 					this.Session.Nick(args[0]);
-					break;
+                    this.SetTitle();
+                    if (this.IsServer)
+                        this.Write("Nick", DateTime.Now, string.Format(" *** You are now known as {0}", args[0]));
+                    break;
 				case "NOTICE":
 				case "N":
 					args = Split(command, arguments, 2, 2);

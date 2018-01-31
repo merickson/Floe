@@ -132,7 +132,7 @@ namespace Floe.UI
 
 		private void ChatWindow_Loaded(object sender, RoutedEventArgs e)
 		{
-			this.AddPage(new ChatControl(ChatPageType.Server, new IrcSession(), null), true);
+			this.AddPage(new ChatControl(ChatPageType.Server, new IrcSession(App.Settings.Current.User.Nickname), null), true);
 
 			if (Application.Current.MainWindow == this)
 			{
@@ -148,7 +148,7 @@ namespace Floe.UI
 				{
 					if (i++ > 0)
 					{
-						this.AddPage(new ChatControl(ChatPageType.Server, new IrcSession(), null), false);
+						this.AddPage(new ChatControl(ChatPageType.Server, new IrcSession(App.Settings.Current.User.Nickname), null), false);
 					}
 					var page = this.Items[this.Items.Count - 1] as ChatTabItem;
 					if (page != null)

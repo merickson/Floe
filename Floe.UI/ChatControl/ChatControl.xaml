@@ -219,8 +219,7 @@
 				 FontSize="{Binding Source={x:Static local:App.Settings}, Path=Current.Formatting.FontSize, Mode=OneWay}"
 				 FontStyle="{Binding Source={x:Static local:App.Settings}, Path=Current.Formatting.FontStyle, Mode=OneWay}"
 				 FontWeight="{Binding Source={x:Static local:App.Settings}, Path=Current.Formatting.FontWeight, Mode=OneWay}"
-				 Padding="1,2,2,2" Margin="0" BorderThickness="0" Height="Auto" TextWrapping="Wrap" MaxLength="512" SpellCheck.IsEnabled="True"
-					 ContextMenuOpening="txtInput_ContextMenuOpening">
+				 Padding="1,2,2,2" Margin="0" BorderThickness="0" Height="Auto" TextWrapping="Wrap" MaxLength="512" SpellCheck.IsEnabled="True">
 				<TextBox.Background>
 					<MultiBinding Converter="{StaticResource opacityConverter}">
 						<Binding Source="{StaticResource editBG}"/>
