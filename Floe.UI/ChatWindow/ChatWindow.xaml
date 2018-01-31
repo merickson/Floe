@@ -167,10 +167,16 @@
 				</TreeView.ItemContainerStyle>
 				<TreeView.Resources>
 					<HierarchicalDataTemplate DataType="{x:Type local:NetworkTreeViewItem}" ItemsSource="{Binding ChannelItems, UpdateSourceTrigger=PropertyChanged}">
-						<TextBlock Text="{Binding NetworkName}" Foreground="{Binding ActivityColor, UpdateSourceTrigger=PropertyChanged}"/>
-					</HierarchicalDataTemplate>
+                        <TextBlock Text="{Binding NetworkName}" Foreground="{Binding ActivityColor, UpdateSourceTrigger=PropertyChanged}">
+                            <TextBlock.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Command="local:ChatWindow.NewTabCommand" CommandTarget="{Binding RelativeSource={RelativeSource TemplatedParent}}"/>
+                                </ContextMenu>
+                            </TextBlock.ContextMenu>
+                        </TextBlock>
+                    </HierarchicalDataTemplate>
 					<DataTemplate DataType="{x:Type local:ChannelTreeViewItem}" >
-						<TextBlock Text="{Binding ChannelName}" Foreground="{Binding ActivityColor, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Text="{Binding ChannelName}" Foreground="{Binding ActivityColor, UpdateSourceTrigger=PropertyChanged}" ContextMenu="{Binding CloseMenu}"/>
 					</DataTemplate>
 				</TreeView.Resources>                   
 			</TreeView>

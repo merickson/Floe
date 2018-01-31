@@ -94,6 +94,8 @@ namespace Floe.UI
 		public ChatPage Page { get; private set; }
 		public string ChannelName { get { return Page.Target != null ? Page.Target.Name : "Channel List"; } }
 
+        public ContextMenu CloseMenu { get; private set; }
+
 		private string _activityColor;
 		public string ActivityColor
 		{
@@ -123,9 +125,15 @@ namespace Floe.UI
 		{
 			this.ActivityColor = "Black";
 			this.Page = page;
-		}
+            this.Page.IsCloseable = true;
+            CloseMenu = new ContextMenu();
+            MenuItem CloseItem = new MenuItem();
+            CloseItem.Command = ChatWindow.CloseTabCommand;
+            CloseItem.CommandParameter = this.Page;
+            CloseMenu.Items.Add(CloseItem);
+        }
 
-		public void OnNotifyStateChanged()
+        public void OnNotifyStateChanged()
 		{
 			if (Page.NotifyState == NotifyState.None)
 				ActivityColor = "Black";

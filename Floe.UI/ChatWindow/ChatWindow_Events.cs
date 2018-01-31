@@ -103,7 +103,7 @@ namespace Floe.UI
 			}
 		}
 
-		private void session_RawMessageReceived(object sender, IrcEventArgs e)
+		private void Session_RawMessageReceived(object sender, IrcEventArgs e)
 		{
 			if (e.Message.Command == "PRIVMSG" && e.Message.Parameters.Count == 2
 				&& (!CtcpCommand.IsCtcpCommand(e.Message.Parameters[1]) ||
@@ -203,7 +203,7 @@ namespace Floe.UI
 			}
 		}
 
-		private void session_InfoReceived(object sender, IrcInfoEventArgs e)
+		private void Session_InfoReceived(object sender, IrcInfoEventArgs e)
 		{
 			var session = sender as IrcSession;
 			switch (e.Code)
@@ -236,8 +236,8 @@ namespace Floe.UI
 			session.SelfKicked += new EventHandler<IrcKickEventArgs>(Session_SelfKicked);
 			session.StateChanged += new EventHandler<EventArgs>(Session_StateChanged);
 			session.CtcpCommandReceived += new EventHandler<CtcpEventArgs>(Session_CtcpCommandReceived);
-			session.RawMessageReceived += new EventHandler<IrcEventArgs>(session_RawMessageReceived);
-			session.InfoReceived += new EventHandler<IrcInfoEventArgs>(session_InfoReceived);
+			session.RawMessageReceived += new EventHandler<IrcEventArgs>(Session_RawMessageReceived);
+			session.InfoReceived += new EventHandler<IrcInfoEventArgs>(Session_InfoReceived);
 		}
 
 		public void UnsubscribeEvents(IrcSession session)
@@ -247,8 +247,8 @@ namespace Floe.UI
 			session.SelfKicked -= new EventHandler<IrcKickEventArgs>(Session_SelfKicked);
 			session.StateChanged -= new EventHandler<EventArgs>(Session_StateChanged);
 			session.CtcpCommandReceived -= new EventHandler<CtcpEventArgs>(Session_CtcpCommandReceived);
-			session.RawMessageReceived -= new EventHandler<IrcEventArgs>(session_RawMessageReceived);
-			session.InfoReceived -= new EventHandler<IrcInfoEventArgs>(session_InfoReceived);
+			session.RawMessageReceived -= new EventHandler<IrcEventArgs>(Session_RawMessageReceived);
+			session.InfoReceived -= new EventHandler<IrcInfoEventArgs>(Session_InfoReceived);
 		}
 	}
 }
