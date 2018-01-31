@@ -374,8 +374,8 @@ namespace Floe.UI
 					args = Split(command, arguments, 1, 1);
 					this.Session.Nick(args[0]);
                     this.SetTitle();
-                    if (this.IsServer)
-                        this.Write("Nick", DateTime.Now, string.Format(" *** You are now known as {0}", args[0]));
+                    if (this.IsServer && this.Session.State == IrcSessionState.Disconnected)
+                        this.Write("Own", string.Format("Your nick is now {0}", args[0]));
                     break;
 				case "NOTICE":
 				case "N":
@@ -522,8 +522,9 @@ namespace Floe.UI
 					}
 					break;
 				case "SERVER":
-					{
-						args = Split(command, arguments, 1, 3);
+                case "S":
+                    {
+                        args = Split(command, arguments, 1, 3);
 						int port = 0;
 						bool useSsl = false;
 						if (args.Length > 1 && (args[1] = args[1].Trim()).Length > 0)
@@ -633,7 +634,8 @@ namespace Floe.UI
 						new CtcpCommand(args[1], args.Skip(2).ToArray()), false);
 					break;
 				case "QUERY":
-					args = Split(command, arguments, 1, 1);
+                case "Q":
+                    args = Split(command, arguments, 1, 1);
 					ChatWindow.ChatCommand.Execute(args[0], this);
 					break;
 				case "BAN":
