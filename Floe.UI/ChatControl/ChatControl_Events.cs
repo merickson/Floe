@@ -7,6 +7,7 @@ using Floe.Net;
 using System.Windows.Documents;
 using System.Text;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace Floe.UI
 {
@@ -17,6 +18,7 @@ namespace Floe.UI
         private bool _hasDeactivated = false, _usingAlternateNick = false;
         private Tuple<int, string> tabData = Tuple.Create(0, "");
         private Window _window;
+		public ObservableCollection<InviteItem> InvitesList;
 
         private void Session_StateChanged(object sender, EventArgs e)
         {
@@ -265,7 +267,7 @@ namespace Floe.UI
                 case IrcCode.RPL_WHOWASUSER:
                     if (e.Message.Parameters.Count == 6 && this.IsDefault)
                     {
-                        this.Write("ServerInfo", e.Message.Time,
+						this.Write("ServerInfo", e.Message.Time,
                             string.Format("{1} " + (e.Code == IrcCode.RPL_WHOWASUSER ? "was" : "is") + " {2}@{3} {4} {5}",
                             (object[])e.Message.Parameters));
                         return;
@@ -274,7 +276,7 @@ namespace Floe.UI
                 case IrcCode.RPL_WHOISCHANNELS:
                     if (e.Message.Parameters.Count == 3 && this.IsDefault)
                     {
-                        this.Write("ServerInfo", e.Message.Time, string.Format("{1} is on {2}",
+						this.Write("ServerInfo", e.Message.Time, string.Format("{1} is on {2}",
                             (object[])e.Message.Parameters));
                         return;
                     }
@@ -282,7 +284,7 @@ namespace Floe.UI
                 case IrcCode.RPL_WHOISSERVER:
                     if (e.Message.Parameters.Count == 4 && this.IsDefault)
                     {
-                        this.Write("ServerInfo", e.Message.Time, string.Format("{1} using {2} {3}",
+						this.Write("ServerInfo", e.Message.Time, string.Format("{1} using {2} {3}",
                             (object[])e.Message.Parameters));
                         return;
                     }
@@ -290,7 +292,7 @@ namespace Floe.UI
                 case IrcCode.RPL_WHOISIDLE:
                     if (e.Message.Parameters.Count == 5 && this.IsDefault)
                     {
-                        this.Write("ServerInfo", e.Message.Time, string.Format("{0} has been idle {1}, signed on {2}",
+						this.Write("ServerInfo", e.Message.Time, string.Format("{0} has been idle {1}, signed on {2}",
                             e.Message.Parameters[1], this.FormatTimeSpan(e.Message.Parameters[2]),
                             this.FormatTime(e.Message.Parameters[3])));
                         return;
@@ -304,6 +306,14 @@ namespace Floe.UI
                         return;
                     }
                     break;
+				case IrcCode.RPL_ENDOFWHOIS:
+					if (e.Message.Parameters.Count == 3 && this.IsDefault)
+					{
+						this.Write("ServerInfo", e.Message.Time, string.Format("{0} {1}",
+							e.Message.Parameters[1], e.Message.Parameters[2]));
+						return;
+					}
+					break;
                 case IrcCode.RPL_LIST:
                 case IrcCode.RPL_LISTSTART:
                 case IrcCode.RPL_LISTEND:
@@ -514,6 +524,7 @@ namespace Floe.UI
             if (this.IsDefault || this.IsServer)
             {
                 this.Write("Invite", e.Message.Time, string.Format("{0} invited you to channel {1}", e.From.Nickname, e.Channel));
+				InvitesList.Add(new InviteItem(e.Channel, e.From.Nickname, DateTime.Now));
             }
         }
 
@@ -1012,9 +1023,14 @@ namespace Floe.UI
             {
                 NameScope.SetNameScope(menu, NameScope.GetNameScope(this));
             }
-        }
+			menu = this.Resources["cmUser"] as ContextMenu;
+			if (menu != null)
+			{
+				NameScope.SetNameScope(menu, NameScope.GetNameScope(this));
+			}
+		}
 
-        private string FormatTime(string text)
+		public string FormatTime(string text)
         {
             int seconds = 0;
             if (!int.TryParse(text, out seconds))

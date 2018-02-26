@@ -13,7 +13,8 @@
 		<KeyBinding Command="local:ChatControl.ClearCommand" Gesture="Alt+C"/>
 		<KeyBinding Command="local:ChatControl.SearchCommand" Gesture="Ctrl+F"/>
 		<KeyBinding Command="local:ChatControl.ChannelPanelCommand" Gesture="Alt+J"/>
-	</UserControl.InputBindings>
+        <KeyBinding Command="local:ChatControl.ChannelInfoCommand" Gesture="Alt+I"/>
+    </UserControl.InputBindings>
 	<UserControl.CommandBindings>
 		<CommandBinding Command="local:ChatControl.WhoisCommand" Executed="ExecuteWhois" CanExecute="CanExecuteConnectedCommand"/>
 		<CommandBinding Command="local:ChatControl.OpenLinkCommand" Executed="ExecuteOpenLink"/>
@@ -38,7 +39,9 @@
 		<CommandBinding Command="local:ChatControl.ChannelPanelCommand" Executed="ExecuteChannelPanel"/>
 		<CommandBinding Command="local:ChatControl.ListCommand" Executed="ExecuteList"/>
 		<CommandBinding Command="local:ChatControl.JoinCommand" Executed="ExecuteJoin"/>
-	</UserControl.CommandBindings>
+        <CommandBinding Command="local:ChatControl.ChannelInfoCommand" Executed="ExecuteChannelInfo"/>
+        <CommandBinding Command="local:ChatControl.UserInfoCommand" Executed="ExecuteUserInfo"/>
+    </UserControl.CommandBindings>
 	<UserControl.Resources>
 		<SolidColorBrush x:Key="defaultBrush" Color="{Binding Source={x:Static local:App.Settings}, Path=Current.Colors.Default}"/>
 		<SolidColorBrush x:Key="transmitBrush" Color="{Binding Source={x:Static local:App.Settings}, Path=Current.Colors.Transmit}"/>
@@ -102,11 +105,20 @@
 			<MenuItem IsCheckable="True" IsChecked="{Binding ElementName=pnlSearch, Path=IsVisible, Mode=OneWay}" CommandTarget="{Binding ElementName=chatControl}" Command="local:ChatControl.SearchCommand" InputGestureText="Ctrl+F"/>
 		</ContextMenu>
 		<ContextMenu x:Key="cmChannel">
-			<MenuItem CommandTarget="{Binding ElementName=chatControl}" Command="local:ChatControl.ClearCommand" InputGestureText="Alt+C"/>
+            <MenuItem CommandTarget="{Binding ElementName=chatControl}" Command="local:ChatControl.ChannelInfoCommand" InputGestureText="Alt+I"/>
 			<Separator/>
 			<MenuItem IsCheckable="True" IsChecked="{Binding ElementName=pnlChannel, Path=IsVisible, Mode=OneWay}" CommandTarget="{Binding ElementName=chatControl}" Command="local:ChatControl.ChannelPanelCommand" InputGestureText="Alt+J"/>
 			<MenuItem IsCheckable="True" IsChecked="{Binding ElementName=pnlSearch, Path=IsVisible, Mode=OneWay}" CommandTarget="{Binding ElementName=chatControl}" Command="local:ChatControl.SearchCommand" InputGestureText="Ctrl+F"/>
-		</ContextMenu>
+            <Separator/>
+            <MenuItem CommandTarget="{Binding ElementName=chatControl}" Command="local:ChatControl.ClearCommand" InputGestureText="Alt+C"/>
+        </ContextMenu>
+        <ContextMenu x:Key="cmUser">
+            <MenuItem CommandTarget="{Binding ElementName=chatControl}" Command="local:ChatControl.UserInfoCommand" InputGestureText="Alt+I"/>
+            <Separator/>
+            <MenuItem IsCheckable="True" IsChecked="{Binding ElementName=pnlSearch, Path=IsVisible, Mode=OneWay}" CommandTarget="{Binding ElementName=chatControl}" Command="local:ChatControl.SearchCommand" InputGestureText="Ctrl+F"/>
+            <Separator/>
+            <MenuItem CommandTarget="{Binding ElementName=chatControl}" Command="local:ChatControl.ClearCommand" InputGestureText="Alt+C"/>
+        </ContextMenu>
 		<Style TargetType="MenuItem" x:Key="colorMenuItem">
 			<Setter Property="Template">
 				<Setter.Value>

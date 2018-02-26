@@ -24,6 +24,8 @@ namespace Floe.UI
 		public ChatPageType Type { get; protected set; }
 		public string Id { get; protected set; }
 		public bool IsServer { get { return this.Type == ChatPageType.Server; } }
+		public bool IsChannel { get { return this.Type == ChatPageType.Chat && Target.IsChannel; } }
+		public bool IsNickname { get { return this.Type == ChatPageType.Chat && !Target.IsChannel; } }
 
 		public virtual void Dispose() { }
 

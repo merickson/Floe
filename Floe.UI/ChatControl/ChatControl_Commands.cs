@@ -36,6 +36,8 @@ namespace Floe.UI
 		public readonly static RoutedUICommand JoinCommand = new RoutedUICommand("Join", "Join", typeof(ChatWindow));
 		public readonly static RoutedUICommand ChannelPanelCommand = new RoutedUICommand("Channel Pane", "ChannelPane", typeof(ChatControl));
 		public readonly static RoutedUICommand ListCommand = new RoutedUICommand("List", "List", typeof(ChatControl));
+		public readonly static RoutedUICommand ChannelInfoCommand = new RoutedUICommand("Channel info", "ChanInfo", typeof(ChatControl));
+		public readonly static RoutedUICommand UserInfoCommand = new RoutedUICommand("User info", "UserInfo", typeof(ChatControl));
 
 		private void CanExecuteConnectedCommand(object sender, CanExecuteRoutedEventArgs e)
 		{
@@ -99,7 +101,8 @@ namespace Floe.UI
 			var s = e.Parameter as string;
 			if (!string.IsNullOrEmpty(s))
 			{
-				this.Session.WhoIs(s);
+				//this.Session.WhoIs(s);
+				UserInfoCommand.Execute(new IrcTarget(s), this);
 			}
 		}
 
@@ -253,6 +256,36 @@ namespace Floe.UI
 			{
 				App.ChatWindow.DccSend(this.Session, new IrcTarget((string)e.Parameter), new System.IO.FileInfo(fileName));
 			}
+		}
+
+		private void ExecuteChannelInfo(object sender, ExecutedRoutedEventArgs e)
+		{
+			if (Target == null)
+				return;
+			// This can happen when ChatControl.xaml KeyBinding InputGesture Alt+I is requested
+			if (this.IsNickname)
+			{
+				ExecuteUserInfo(sender, e);
+				return;
+			}
+			var infoWindow = new UI.InfoWindows.ChannelInfoWindow(this);
+			infoWindow.Owner = Application.Current.MainWindow;
+			infoWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+			infoWindow.ShowDialog();
+		}
+
+
+		private void ExecuteUserInfo(object sender, ExecutedRoutedEventArgs e)
+		{
+			if (Target == null)
+				return;
+			IrcTarget target = Target;
+			if (e.Parameter is IrcTarget)
+				target = e.Parameter as IrcTarget;
+			var infoWindow = new UI.InfoWindows.UserInfoWindow(Session, target);
+			infoWindow.Owner = Application.Current.MainWindow;
+			infoWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+			infoWindow.ShowDialog();
 		}
 
 		private void ExecuteSearch(object sender, ExecutedRoutedEventArgs e)
@@ -436,8 +469,16 @@ namespace Floe.UI
 					this.Session.Join(args[0]);
 					break;
 				case "INVITE":
-					args = Split(command, arguments, 2, 2);
-					this.Session.Invite(args[1], args[0]);
+					args = Split(command, arguments, 0, 2);
+					if (args.Length == 1)
+					{
+						args = Split(command, arguments, 2, 2);
+						break;
+					}
+					if (args.Length == 0)
+						this.Session.Invite();
+					else
+						this.Session.Invite(args[1], args[0]);
 					break;
 				case "KICK":
 					args = Split(command, arguments, 2, 3, true);

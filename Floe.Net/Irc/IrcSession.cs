@@ -509,6 +509,14 @@ namespace Floe.Net
 		}
 
 		/// <summary>
+		/// Query the actual list of channels invited to.
+		/// </summary>
+		public void Invite()
+		{
+			this.Send("INVITE");
+		}
+
+		/// <summary>
 		/// Invite another user to a channel. The session must have the appropriate permissions on the channel.
 		/// </summary>
 		/// <param name="channel">The channel to which the user will be invited.</param>
@@ -760,6 +768,14 @@ namespace Floe.Net
 			lock (_captures)
 			{
 				return _captures.Remove(capture);
+			}
+		}
+
+		public bool ContainsHandler(IrcCodeHandler capture)
+		{
+			lock (_captures)
+			{
+				return _captures.Contains(capture);
 			}
 		}
 

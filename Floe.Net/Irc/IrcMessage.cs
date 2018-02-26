@@ -78,7 +78,7 @@ namespace Floe.Net
 				}
 
 				sb.Append(' ');
-                if ((i == this.Parameters.Count - 1) && (this.Command != "PASS"))
+                if ((i == this.Parameters.Count - 1) && (this.Command != "PASS") && (this.Parameters[i] != ":"))
 					sb.Append(':');
 				sb.Append(this.Parameters[i]);
 			}

@@ -39,6 +39,7 @@ namespace Floe.UI
 		{
 			_history = new LinkedList<string>();
 			_nickList = new NicknameList();
+			InvitesList = new ObservableCollection<InviteItem>();
 
 			InitializeComponent();
 
@@ -128,8 +129,6 @@ namespace Floe.UI
 			boxOutput.ContextMenu = this.GetDefaultContextMenu();
 		}
 
-		public bool IsChannel { get { return this.Type == ChatPageType.Chat && this.Target.IsChannel; } }
-		public bool IsNickname { get { return this.Type == ChatPageType.Chat && !this.Target.IsChannel; } }
 		public string Perform { get; set; }
 
 		public static readonly DependencyProperty IsConnectedProperty =
@@ -343,10 +342,15 @@ namespace Floe.UI
 				}
 				return menu;
 			}
-			else
+			else if (this.IsChannel)
 			{
 				return this.Resources["cmChannel"] as ContextMenu;
 			}
+			else if (this.IsNickname)
+			{
+				return this.Resources["cmUser"] as ContextMenu;
+			}
+			return null;
 		}
 
 		public override void Dispose()
