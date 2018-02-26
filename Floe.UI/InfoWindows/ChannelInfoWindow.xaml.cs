@@ -325,7 +325,8 @@ namespace Floe.UI.InfoWindows
 			CaptureModes();
 			CaptureBans();
 			CaptureExceptions();
-			CaptureInvites();
+			if (InvitesList.Count == 0)
+				CaptureInvites();
 			this.DataContext = this;
 		}
 
@@ -437,10 +438,8 @@ namespace Floe.UI.InfoWindows
 		{
 			invitesHandler = new IrcCodeHandler((e) =>
 			{
-				// ** Disabled, since ircds sends only the invited channel names without the other paramters like who sent the invite, 
-				//    so we use ChatControl's always complete InvitesList ** //
-				//InvitesList.Add(new InviteItem(e.Text));
-				//this.Session.AddHandler(invitesHandler);
+				InvitesList.Add(new InviteItem(e.Text));
+				this.Session.AddHandler(invitesHandler);
 				e.Handled = true;
 				return true;
 			}, IrcCode.RPL_INVITELIST);
