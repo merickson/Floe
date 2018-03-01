@@ -7,6 +7,37 @@
         mc:Ignorable="d"
         Title="UserInfoWindow" Height="400" Width="400">
     <Grid>
-        
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <TextBlock x:Name="TxtBlockRealName" Grid.Row="0" HorizontalAlignment="Right" Margin="10,0,5,0"/>
+        <TextBlock x:Name="TxtBlockRealNameData" Grid.Row="0" Grid.Column="1" TextWrapping="Wrap"/>
+        <TextBlock x:Name="TxtBlockChannels" Grid.Row="1" HorizontalAlignment="Right" Margin="10,0,5,0" Visibility="Collapsed"/>
+        <TextBlock x:Name="TxtBlockChannelsData" Grid.Row="1" Grid.Column="1" TextWrapping="Wrap" Visibility="Collapsed"/>
+        <TextBlock x:Name="TxtBlockServer" Grid.Row="2" HorizontalAlignment="Right" Margin="10,0,5,0"/>
+        <TextBlock x:Name="TxtBlockServerData" Grid.Row="2" Grid.Column="1" TextWrapping="Wrap"/>
+        <TextBlock x:Name="TxtBlockAway" Grid.Row="3" HorizontalAlignment="Right" Margin="10,0,5,0" Visibility="Collapsed"/>
+        <TextBlock x:Name="TxtBlockAwayData" Grid.Row="3" Grid.Column="1" TextWrapping="Wrap" Visibility="Collapsed"/>
+        <TextBlock x:Name="TxtBlockOper" Grid.Row="4" HorizontalAlignment="Right" Margin="10,0,5,0" Visibility="Collapsed"/>
+        <TextBlock x:Name="TxtBlockOperData" Grid.Row="4" Grid.Column="1" TextWrapping="Wrap" Visibility="Collapsed"/>
+        <TextBlock x:Name="TxtBlockAccount" Grid.Row="5" HorizontalAlignment="Right" Margin="10,0,5,0" Visibility="Collapsed"/>
+        <TextBlock x:Name="TxtBlockAccountData" Grid.Row="5" Grid.Column="1" TextWrapping="Wrap" Visibility="Collapsed"/>
+        <TextBlock x:Name="TxtBlockUserHost" Grid.Row="6" HorizontalAlignment="Right" Margin="10,0,5,0" Visibility="Collapsed"/>
+        <TextBlock x:Name="TxtBlockUserHostData" Grid.Row="6" Grid.Column="1" TextWrapping="Wrap" Visibility="Collapsed"/>
+        <TextBlock x:Name="TxtBlockIdle" Grid.Row="7" HorizontalAlignment="Right" Margin="10,0,5,0" Visibility="Collapsed"/>
+        <TextBlock x:Name="TxtBlockIdleData" Grid.Row="7" Grid.Column="1" TextWrapping="Wrap" Visibility="Collapsed"/>
+        <TextBlock x:Name="TxtBlockInvite" Grid.Row="8" HorizontalAlignment="Right" Margin="10,0,5,0" Visibility="Collapsed"/>
+        <TextBlock x:Name="TxtBlockInviteData" Grid.Row="8" Grid.Column="1" TextWrapping="Wrap" Visibility="Collapsed"/>
     </Grid>
 </Window>

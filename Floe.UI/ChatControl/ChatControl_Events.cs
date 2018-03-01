@@ -253,7 +253,7 @@ namespace Floe.UI
                         this.Target.Equals(new IrcTarget(e.Message.Parameters[1])))
                     {
                         this.Write("Topic", e.Message.Time, string.Format("Topic set by {0} on {1}", e.Message.Parameters[2],
-                            this.FormatTime(e.Message.Parameters[3])));
+                            FormatTime(e.Message.Parameters[3])));
                     }
                     return;
                 case IrcCode.RPL_CHANNELCREATEDON:
@@ -293,8 +293,8 @@ namespace Floe.UI
                     if (e.Message.Parameters.Count == 5 && this.IsDefault)
                     {
 						this.Write("ServerInfo", e.Message.Time, string.Format("{0} has been idle {1}, signed on {2}",
-                            e.Message.Parameters[1], this.FormatTimeSpan(e.Message.Parameters[2]),
-                            this.FormatTime(e.Message.Parameters[3])));
+                            e.Message.Parameters[1], FormatTimeSpan(e.Message.Parameters[2]),
+							FormatTime(e.Message.Parameters[3])));
                         return;
                     }
                     break;
@@ -1030,7 +1030,7 @@ namespace Floe.UI
 			}
 		}
 
-		public string FormatTime(string text)
+		public static string FormatTime(string text)
         {
             int seconds = 0;
             if (!int.TryParse(text, out seconds))
@@ -1041,7 +1041,7 @@ namespace Floe.UI
             return new DateTime(1970, 1, 1).Add(ts).ToLocalTime().ToString();
         }
 
-        private string FormatTimeSpan(string text)
+        public static string FormatTimeSpan(string text)
         {
             int seconds = 0;
             if (!int.TryParse(text, out seconds))
