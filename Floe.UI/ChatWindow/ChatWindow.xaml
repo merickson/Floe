@@ -299,7 +299,6 @@
 													</ContextMenu>
 												</ScrollContentPresenter.ContextMenu>
 											</ScrollContentPresenter>
-												<!--This whole StackPanel is hidden for now by this Visibility="Collapsed" until decided what to do with all of this PrevTab and NextTab -->
 												<StackPanel Grid.Column="1"	Orientation="Horizontal" Visibility="{Binding Path=TabsOrientationTemplate.StackPanelVisibility}">
 												<RepeatButton Focusable="False" Command="local:ChatWindow.PreviousTabCommand" Style="{StaticResource uiRepeatButtonStyle}"
 													  Padding="2,5,2,5" Margin="5,0,0,0" VerticalAlignment="Center"
