@@ -17,8 +17,11 @@ namespace Floe.UI
 		{
 			string _firstChan = ((ChatWindow)_window).Items.Where((item) => item.IsSelected).Select(p => p.Page.Target.Name).FirstOrDefault();
 			int index = Array.IndexOf(_chanList, _firstChan);
-			_chanList[index] = _chanList[0];
-			_chanList[0] = _firstChan;
+			if (index >= 0)
+			{
+				_chanList[index] = _chanList[0];
+				_chanList[0] = _firstChan;
+			}
 		}
 
 		private void DoChannelCompletion()
