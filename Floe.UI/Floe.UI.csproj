@@ -147,6 +147,7 @@
     <Compile Include="ChatWindow\ChatWindow.xaml.cs">
       <DependentUpon>ChatWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ChatWindow\ChatWindow_TabsOrientationTemplating.cs" />
     <Compile Include="ChatWindow\ChatWindow_TreeView.cs" />
     <Compile Include="ChatWindow\ChatWindow_WndProc.cs" />
     <Compile Include="ChatWindow\ChatWindow_OverlayIcon.cs" />

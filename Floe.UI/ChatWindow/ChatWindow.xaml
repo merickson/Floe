@@ -51,7 +51,7 @@
 			<MenuItem Click="NotifyQuit_Click" Header="Quit"/>
 		</ContextMenu>
 
-		<LinearGradientBrush x:Key="winTabSep" StartPoint="0,0" EndPoint="0,1">
+		<LinearGradientBrush x:Key="winTabSep" StartPoint="0,0" EndPoint="{Binding Path=TabsOrientationTemplate.LinearGradientBrushEndPoint}">
 			<GradientStop Offset="0" Color="{Binding Source={StaticResource winFGx0}, Converter={StaticResource brushToColor}}"/>
 			<GradientStop Offset="0.5" Color="{Binding Source={StaticResource winFG}, Converter={StaticResource brushToColor}}"/>
 			<GradientStop Offset="1" Color="{Binding Source={StaticResource winFGx0}, Converter={StaticResource brushToColor}}"/>
@@ -167,16 +167,23 @@
 				</TreeView.ItemContainerStyle>
 				<TreeView.Resources>
 					<HierarchicalDataTemplate DataType="{x:Type local:NetworkTreeViewItem}" ItemsSource="{Binding ChannelItems, UpdateSourceTrigger=PropertyChanged}">
-                        <TextBlock Text="{Binding NetworkName}" Foreground="{Binding ActivityColor, UpdateSourceTrigger=PropertyChanged}">
-                            <TextBlock.ContextMenu>
-                                <ContextMenu>
-                                    <MenuItem Command="local:ChatWindow.NewTabCommand" CommandTarget="{Binding RelativeSource={RelativeSource TemplatedParent}}"/>
-                                </ContextMenu>
-                            </TextBlock.ContextMenu>
-                        </TextBlock>
-                    </HierarchicalDataTemplate>
+						<TextBlock Text="{Binding NetworkName}" Foreground="{Binding ActivityColor, UpdateSourceTrigger=PropertyChanged}">
+							<TextBlock.ContextMenu>
+								<ContextMenu>
+									<MenuItem Command="local:ChatWindow.NewTabCommand" CommandTarget="{Binding RelativeSource={RelativeSource TemplatedParent}}"/>
+								</ContextMenu>
+							</TextBlock.ContextMenu>
+						</TextBlock>
+					</HierarchicalDataTemplate>
 					<DataTemplate DataType="{x:Type local:ChannelTreeViewItem}" >
-                        <TextBlock Text="{Binding ChannelName}" Foreground="{Binding ActivityColor, UpdateSourceTrigger=PropertyChanged}" ContextMenu="{Binding CloseMenu}"/>
+						<TextBlock Text="{Binding ChannelName}" Foreground="{Binding ActivityColor, UpdateSourceTrigger=PropertyChanged}" ContextMenu="{Binding CloseMenu}">
+						<!--<TextBlock Text="{Binding ChannelName}" Foreground="{Binding ActivityColor, UpdateSourceTrigger=PropertyChanged}">
+							<TextBlock.ContextMenu>
+								<ContextMenu>
+									<MenuItem Command="local:ChatWindow.CloseTabCommand" CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ChannelTreeViewItem}}, Path=Page}" CommandTarget="{Binding RelativeSource={RelativeSource TemplatedParent}}"/>
+								</ContextMenu>
+							</TextBlock.ContextMenu>-->
+						</TextBlock>
 					</DataTemplate>
 				</TreeView.Resources>                   
 			</TreeView>
@@ -269,11 +276,11 @@
 												<Setter Property="BorderThickness" Value="0,0,0,1"/>
 											</DataTrigger>
 										</Style.Triggers>
-										<Setter Property="DockPanel.Dock" Value="Bottom"/>
+										<Setter Property="DockPanel.Dock" Value="{Binding Path=TabsOrientationTemplate.BorderDock}"/>
 									</Style>
 								</Border.Style>
 								<ScrollViewer Name="scrollViewer" Focusable="False"
-								  HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled">
+								  HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="{Binding Path=TabsOrientationTemplate.VerticalScrollBarVisibility}">
 
 								<ScrollViewer.Template>
 									<ControlTemplate TargetType="ScrollViewer">
@@ -292,8 +299,8 @@
 													</ContextMenu>
 												</ScrollContentPresenter.ContextMenu>
 											</ScrollContentPresenter>
-											<StackPanel Grid.Column="1"
-												Orientation="Horizontal">
+												<!--This whole StackPanel is hidden for now by this Visibility="Collapsed" until decided what to do with all of this PrevTab and NextTab -->
+												<StackPanel Grid.Column="1"	Orientation="Horizontal" Visibility="{Binding Path=TabsOrientationTemplate.StackPanelVisibility}">
 												<RepeatButton Focusable="False" Command="local:ChatWindow.PreviousTabCommand" Style="{StaticResource uiRepeatButtonStyle}"
 													  Padding="2,5,2,5" Margin="5,0,0,0" VerticalAlignment="Center"
 													  Content="{StaticResource leftArrowPath}"/>
@@ -318,7 +325,7 @@
 										</Grid>
 									</ControlTemplate>
 								</ScrollViewer.Template>
-								<StackPanel IsItemsHost="True" Orientation="Horizontal" Height="25" Background="Transparent"/>
+									<StackPanel IsItemsHost="True" Orientation="{Binding Path=TabsOrientationTemplate.StackPanelOrientation}" Height="Auto" Background="Transparent"/>
 							</ScrollViewer>
 							</Border>
 							<ContentPresenter Name="PART_SelectedContentHost" ContentSource="SelectedContent" Margin="0"/>
@@ -336,10 +343,12 @@
 										</ContextMenu>
 									</Setter.Value>
 								</Setter>
+								<Setter Property="FontWeight" Value="Normal"/>
 							</DataTrigger>
 						</Style.Triggers>
 						<Setter Property="Header" Value="{Binding RelativeSource={RelativeSource Self}, Path=Page.Header}"/>
 						<Setter Property="Content" Value="{Binding Content}"/>
+						<Setter Property="FontWeight" Value="Bold"/>
 						<Setter Property="Foreground" Value="{StaticResource winFG}"/>
 						<Setter Property="FocusVisualStyle" Value="{x:Null}"/>
 						<Setter Property="Template">
@@ -365,8 +374,8 @@
 										</Grid>
 									<Border x:Name="border0" Background="Transparent">
 										<Border x:Name="border1">
-											<Border x:Name="border2" BorderThickness="0,0,1,0" BorderBrush="{StaticResource winTabSep}">
-												<Grid Height="25" HorizontalAlignment="Center" MinWidth="{Binding Source={x:Static local:App.Settings}, Path=Current.Windows.MinTabWidth}">
+												<Border x:Name="border2" BorderThickness="{Binding Path=TabsOrientationTemplate.WinTabSepBorderThickness}" BorderBrush="{StaticResource winTabSep}">
+													<Grid Height="25" HorizontalAlignment="{Binding Path=TabsOrientationTemplate.BorderGridHorizontalAlignment}" MinWidth="{Binding Source={x:Static local:App.Settings}, Path=Current.Windows.MinTabWidth}">
 													<Grid.RowDefinitions>
 														<RowDefinition x:Name="row1" Height="7"/>
 														<RowDefinition x:Name="row2" Height="*"/>
@@ -378,11 +387,11 @@
 													</Grid.ColumnDefinitions>
 													<Polygon x:Name="arrow" Grid.ColumnSpan="3" Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Top" Points="0,0 10,6, 20,0"
 														 Stroke="{StaticResource winFG}" Fill="{StaticResource winFG}" Visibility="Hidden"/>
-													<ContentPresenter Grid.Column="0" Grid.Row="1" Margin="5,0,10,0" x:Name="ContentSite" VerticalAlignment="Bottom" HorizontalAlignment="Center"
+													<ContentPresenter Grid.ColumnSpan="2" Grid.Row="1" Margin="5,0,10,0" x:Name="ContentSite" VerticalAlignment="Bottom" HorizontalAlignment="Center"
 																  ContentSource="Header" RecognizesAccessKey="False"/>
 													<Button x:Name="btnTabClose" Margin="0,0,4,0" Style="{StaticResource tabCloseButtonStyle}"
 														Command="local:ChatWindow.CloseTabCommand" Grid.Column="2" Grid.Row="1"
-														Height="Auto" VerticalAlignment="Bottom"
+														Height="Auto" VerticalAlignment="Bottom" HorizontalAlignment="Right"
 														CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=TabItem}, Path=Page}"/>
 												</Grid>
 											</Border>

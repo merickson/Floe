@@ -16,10 +16,14 @@ namespace Floe.UI
 
 		public ChatControl ActiveControl { get { return tabsChat.SelectedContent as ChatControl; } }
 
+		public TabsOrientationTemplate TabsOrientationTemplate { get; private set; }
+
 		public ChatWindow()
 		{
 			this.Items = new ObservableCollection<ChatTabItem>();
 			this.NetworkTreeViewList = new ObservableCollection<NetworkTreeViewItem>();
+			Configuration.WindowsElement.OrientationChanged += OnTabsOrientationChanged;
+			TabsOrientationTemplate = new TabsOrientationTemplate(App.Settings.Current.Windows.TabStripPosition);
 			this.DataContext = this;
 			InitializeComponent();
 
@@ -278,6 +282,12 @@ namespace Floe.UI
 		{
 			if (e.ChangedButton == MouseButton.Left)
 				this.DragMove();
+		}
+
+		private void OnTabsOrientationChanged(object sender, EventArgs e)
+		{
+			var TabStripPos = App.Settings.Current.Windows.TabStripPosition;
+			TabsOrientationTemplate.ChangeOrientation(TabStripPos);
 		}
 	}
 }
