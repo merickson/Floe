@@ -1126,22 +1126,37 @@ namespace Floe.UI
                             modeParam.Add(mode.Parameter);
                     }
                 }
-                else if (_chanModes.Contains(mode.Mode) && !mode.Set)
+                else if (_chanModes.Contains(mode.Mode))
                 {
-                    sb.Remove(sb.ToString().IndexOf(mode.Mode), 1);
-                    if (modeParam.Count > 0)
-                    {
-                        if (mode.Mode == 'l')
-                            modeParam.RemoveAt(0);
-                        if (mode.Mode == 'k')
-                        {
-                            if (modeParam.Count > 1)
-                                modeParam.RemoveAt(1);
-                            else
-                                modeParam.RemoveAt(0);
-                        }
-                    }
-                }
+					if (!mode.Set)
+					{
+						sb.Remove(sb.ToString().IndexOf(mode.Mode), 1);
+						if (modeParam.Count > 0)
+						{
+							if (mode.Mode == 'l')
+								modeParam.RemoveAt(0);
+							if (mode.Mode == 'k')
+							{
+								if (modeParam.Count > 1)
+									modeParam.RemoveAt(1);
+								else
+									modeParam.RemoveAt(0);
+							}
+						}
+					}
+					else
+					{
+						if (mode.Mode == 'l')
+							modeParam[0] = mode.Parameter;
+						if (mode.Mode == 'k')
+						{
+							if (modeParam.Count > 1)
+								modeParam[1] = mode.Parameter;
+							else
+								modeParam[0] = mode.Parameter;
+						}
+					}
+				}
             }
             sb = new StringBuilder(OrderChannelModes(sb.ToString()));
             if (modeParam.Count > 0)
