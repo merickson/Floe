@@ -621,6 +621,10 @@ namespace Floe.UI
 						}
 					}
 					break;
+				case "VERSION":
+					args = Split(command, arguments, 1, 1);
+					this.Session.SendCtcp(new IrcTarget(args[0]), new CtcpCommand("VERSION", new string[] { }), false);
+					break;
 				case "SETUP":
 					App.ShowSettings();
 					break;
