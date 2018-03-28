@@ -405,6 +405,10 @@ namespace Floe.UI
 					args = Split(command, arguments, 1, 2);
 					this.Session.Oper(args);
 					break;
+				case "KILL":
+					args = Split(command, arguments, 2, 2);
+					this.Session.Kill(new IrcTarget(args[0]), args[1]);
+					break;
 				case "QUIT":
 					args = Split(command, arguments, 0, 1);
 					this.Session.AutoReconnect = false;

@@ -402,6 +402,16 @@ namespace Floe.Net
 		}
 
 		/// <summary>
+		/// Kill a user. The session must be an IRC Operator.
+		/// </summary>
+		/// <param name="target">The user who will be killed.</param>
+		/// <param name="message">The kill message.</param>
+		public void Kill(IrcTarget target, string message)
+		{
+			this.Send("KILL", target, message);
+		}
+
+		/// <summary>
 		/// Change the nickname.
 		/// </summary>
 		/// <param name="newNickname">The new nickname.</param>
