@@ -38,7 +38,7 @@ namespace Floe.UI.InfoWindows
 			CaptureWhoisIdle();
 			CaptureWhoisInvitings();
 			CaptureWhoisEnd();
-			this.Session.WhoIs(target.Name, target.Name);
+			this.Session.WhoIs(target.Name);
 		}
 
 		private void CaptureWhoisUser()

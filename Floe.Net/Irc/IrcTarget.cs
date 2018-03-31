@@ -8,6 +8,11 @@ namespace Floe.Net
 	public sealed class IrcTarget
 	{
 		/// <summary>
+		/// Gets the IrcPrefix of this IrcTarget was constructed from.
+		/// </summary>
+		public IrcPrefix Prefix { get; private set; }
+
+		/// <summary>
 		/// Gets a value indicating whether the target is a channel. If this is false, the target is a user.
 		/// </summary>
 		public bool IsChannel { get; private set; }
@@ -45,6 +50,7 @@ namespace Floe.Net
 		/// <param name="peer"></param>
 		public IrcTarget(IrcPeer peer)
 		{
+			this.Prefix = peer;
 			this.IsChannel = false;
 			this.Name = peer.Nickname;
 		}
@@ -55,6 +61,7 @@ namespace Floe.Net
 		/// <param name="peer"></param>
 		public IrcTarget(IrcServer peer)
 		{
+			this.Prefix = peer;
 			this.IsChannel = false;
 			this.Name = peer.ServerName;
 		}
@@ -65,6 +72,7 @@ namespace Floe.Net
 		/// <param name="peer"></param>
 		public IrcTarget(IrcPrefix peer)
 		{
+			this.Prefix = peer;
 			this.IsChannel = false;
 			if (peer is IrcPeer)
 			{

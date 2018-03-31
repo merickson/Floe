@@ -73,7 +73,7 @@ namespace Floe.Net
 		/// <summary>
 		/// Gets the user who sent the message.
 		/// </summary>
-		public IrcPeer From { get; private set; }
+		public IrcTarget From { get; private set; }
 
 		/// <summary>
 		/// Gets the target of the message. It could be sent to a channel or directly to the user who owns the IRC session.
@@ -88,7 +88,7 @@ namespace Floe.Net
 		internal IrcMessageEventArgs(IrcMessage message)
 			: base(message)
 		{
-			this.From = message.From as IrcPeer;
+			this.From = new IrcTarget(message.From);
 			this.To = message.Parameters.Count > 0 ? new IrcTarget(message.Parameters[0]) : null;
 			this.Text = message.Parameters.Count > 1 ? message.Parameters[1] : null;
 		}
@@ -177,7 +177,7 @@ namespace Floe.Net
 		/// <summary>
 		/// Gets the user who changed the topic.
 		/// </summary>
-        public IrcPeer Who { get; private set; }
+        public IrcTarget Who { get; private set; }
 
 		/// <summary>
 		/// Gets the channel in which the topic was changed.
@@ -192,7 +192,7 @@ namespace Floe.Net
         internal IrcTopicEventArgs(IrcMessage message)
             : base(message)
         {
-            this.Who = message.From as IrcPeer;
+            this.Who = new IrcTarget(message.From);
             this.Channel = message.Parameters.Count > 0 ? new IrcTarget(message.Parameters[0]) : null;
             this.Text = message.Parameters.Count > 1 ? message.Parameters[1] : null;
         }
@@ -206,7 +206,7 @@ namespace Floe.Net
 		/// <summary>
 		/// Gets the user who sent the invite.
 		/// </summary>
-		public IrcPeer From { get; private set; }
+		public IrcTarget From { get; private set; }
 
 		/// <summary>
 		/// Gets the channel to which the target was invited.
@@ -216,7 +216,7 @@ namespace Floe.Net
 		internal IrcInviteEventArgs(IrcMessage message)
 			: base(message)
 		{
-			this.From = message.From as IrcPeer;
+			this.From = new IrcTarget(message.From);
 			this.Channel = message.Parameters.Count > 1 ? message.Parameters[1] : null;
 		}
 	}
@@ -229,7 +229,7 @@ namespace Floe.Net
 		/// <summary>
 		/// Gets the user who performed the kick.
 		/// </summary>
-		public IrcPeer Kicker { get; private set; }
+		public IrcTarget Kicker { get; private set; }
 
 		/// <summary>
 		/// Gets the channel from which someone has been kicked.
@@ -249,7 +249,7 @@ namespace Floe.Net
 		internal IrcKickEventArgs(IrcMessage message)
 			: base(message)
 		{
-			this.Kicker = message.From as IrcPeer;
+			this.Kicker = new IrcTarget(message.From);
 			this.Channel = message.Parameters.Count > 0 ? new IrcTarget(message.Parameters[0]) : null;
 			this.KickeeNickname = message.Parameters.Count > 1 ? message.Parameters[1] : null;
 			this.Text = message.Parameters.Count > 2 ? message.Parameters[2] : null;
@@ -264,7 +264,7 @@ namespace Floe.Net
 		/// <summary>
 		/// Gets the user who performed the mode change.
 		/// </summary>
-		public IrcPrefix Who { get; private set; }
+		public IrcTarget Who { get; private set; }
 
 		/// <summary>
 		/// Gets the channel on which the modes were changed.
@@ -279,7 +279,7 @@ namespace Floe.Net
 		internal IrcChannelModeEventArgs(IrcMessage message)
 			: base(message)
 		{
-			this.Who = message.From;
+			this.Who = new IrcTarget(message.From);
 			this.Channel = message.Parameters.Count > 0 ? new IrcTarget(message.Parameters[0]) : null;
 			this.Modes = message.Parameters.Count > 1 ? IrcChannelMode.ParseModes(message.Parameters.Skip(1)) : null;
 		}
@@ -346,7 +346,7 @@ namespace Floe.Net
 		/// <summary>
 		/// Gets the user who sent the command.
 		/// </summary>
-		public IrcPeer From { get; private set; }
+		public IrcTarget From { get; private set; }
 
 		/// <summary>
 		/// Gets the target to which the command was sent. It could be sent to a channel or directly to the user who owns the IRC session.
@@ -366,7 +366,7 @@ namespace Floe.Net
 		internal CtcpEventArgs(IrcMessage message)
 			: base(message)
 		{
-			this.From = message.From as IrcPeer;
+			this.From = new IrcTarget(message.From);
 			this.To = message.Parameters.Count > 0 ? new IrcTarget(message.Parameters[0]) : null;
 			this.Command = message.Parameters.Count > 1 ? CtcpCommand.Parse(message.Parameters[1]) : null;
 			this.IsResponse = message.Command == "NOTICE";

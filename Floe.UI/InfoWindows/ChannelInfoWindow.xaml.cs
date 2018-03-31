@@ -549,15 +549,11 @@ namespace Floe.UI.InfoWindows
 			ToggleModeButtons(e.Modes);
 
 			IrcChannelMode modeBan = e.Modes.Where(m => m.Mode == 'b').FirstOrDefault();
-			var From = IrcPrefix.Parse(e.Who.Prefix);
-			string setby = From.Prefix;
-			if (From is IrcPeer FromNick)
-				setby = FromNick.Nickname;
 			if (modeBan.Mode != Char.MinValue)
 			{
 				if (modeBan.Set == true)
 				{
-					BanItem NewBanItem = new BanItem(modeBan.Parameter, setby, DateTime.Now);
+					BanItem NewBanItem = new BanItem(modeBan.Parameter, e.Who.Name, DateTime.Now);
 					IsNewRowAdding = true;
 					BanList.Add(NewBanItem);
 				}
@@ -571,7 +567,7 @@ namespace Floe.UI.InfoWindows
 			{
 				if (modeExcept.Set == true)
 				{
-					ExceptItem NewExceptItem = new ExceptItem(modeExcept.Parameter, setby, DateTime.Now);
+					ExceptItem NewExceptItem = new ExceptItem(modeExcept.Parameter, e.Who.Name, DateTime.Now);
 					IsNewRowAdding = true;
 					ExceptsList.Add(NewExceptItem);
 				}
@@ -584,7 +580,7 @@ namespace Floe.UI.InfoWindows
 
 		private void Session_Invited(object sender, IrcInviteEventArgs e)
 		{
-			InvitesList.Add(new InviteItem(e.Channel, e.From.Nickname, DateTime.Now));
+			InvitesList.Add(new InviteItem(e.Channel, e.From.Name, DateTime.Now));
 		}
 
 		private void ExecuteAddBanMask(object sender, ExecutedRoutedEventArgs e)

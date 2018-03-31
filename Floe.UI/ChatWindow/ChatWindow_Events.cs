@@ -68,7 +68,7 @@ namespace Floe.UI
 
 		private void Session_CtcpCommandReceived(object sender, CtcpEventArgs e)
 		{
-			if (App.IsIgnoreMatch(e.From, IgnoreActions.Ctcp))
+			if (App.IsIgnoreMatch(e.From.Prefix, IgnoreActions.Ctcp))
 			{
 				return;
 			}
@@ -80,24 +80,24 @@ namespace Floe.UI
 				switch (e.Command.Command)
 				{
 					case "VERSION":
-						session.SendCtcp(new IrcTarget(e.From), new CtcpCommand(
+						session.SendCtcp(e.From, new CtcpCommand(
 							"VERSION",
 							App.Product,
 							App.Version), true);
 						break;
 					case "PING":
-						session.SendCtcp(new IrcTarget(e.From), new CtcpCommand(
+						session.SendCtcp(e.From, new CtcpCommand(
 							"PONG",
 							e.Command.Arguments.Length > 0 ? e.Command.Arguments[0] : null), true);
 						break;
 					case "CLIENTINFO":
-						session.SendCtcp(new IrcTarget(e.From), new CtcpCommand(
+						session.SendCtcp(e.From, new CtcpCommand(
 							"CLIENTINFO",
 							"VERSION", "PING", "CLIENTINFO", "ACTION"), true);
 						break;
 					case "DCC":
 						var args = e.Command.Arguments;
-						e.Handled = this.HandleDcc(session, new IrcTarget(e.From), args);
+						e.Handled = this.HandleDcc(session, e.From, args);
 						break;
 				}
 			}
