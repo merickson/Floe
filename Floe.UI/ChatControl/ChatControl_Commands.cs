@@ -590,7 +590,7 @@ namespace Floe.UI
 						string password = null;
 						if (args.Length > 2)
 						{
-							password = args[2];
+							password = String.Join(" ", args.Skip(2).ToArray());
 						}
 						if (port == 0)
 						{
