@@ -250,6 +250,8 @@ namespace Floe.UI
 				this.Write(styleKey, date, (IrcPeer)peer, text, attn);
 			if (peer is IrcServer)
 				this.Write(styleKey, date, (IrcServer)peer, text, attn);
+			else
+				this.Write(styleKey, date, text);
 		}
 
 		private void Write(string styleKey, IrcPeer peer, string text, bool attn)

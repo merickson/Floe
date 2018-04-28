@@ -219,6 +219,13 @@ namespace Floe.UI
         {
             switch (e.Code)
             {
+				case IrcCode.ERR_ERROR:
+					if (this.IsServer)
+					{
+						this.Write("Error", e.Text);
+						e.Handled = true;
+					}
+					break;
                 case IrcCode.ERR_NICKNAMEINUSE:
                     if (this.IsServer && this.Session.State == IrcSessionState.Connecting)
                     {

@@ -936,6 +936,7 @@ namespace Floe.Net
 				case "CAP":
 					this.OnCap(e.Message);
 					break;
+				case "ERROR":
 				default:
 					this.OnOther(e.Message);
 					break;
@@ -1124,6 +1125,11 @@ namespace Floe.Net
 					}
 				}
 
+				this.RaiseEvent(this.InfoReceived, e);
+			}
+			else if (message.Command == "ERROR")
+			{
+				var e = new IrcInfoEventArgs(new IrcMessage(((int)IrcCode.ERR_ERROR).ToString(), message.Parameters.ToArray()));
 				this.RaiseEvent(this.InfoReceived, e);
 			}
 		}

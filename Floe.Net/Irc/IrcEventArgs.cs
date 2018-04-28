@@ -335,6 +335,9 @@ namespace Floe.Net
 
 			this.Text = message.Parameters.Count > 1 ? string.Join(" ", message.Parameters.Skip(1).ToArray()) : null;
 			this.IsError = (int)this.Code >= 400;
+
+			if (this.IsError && String.IsNullOrEmpty(this.Text))
+				this.Text = "ERROR: " + message.Parameters[0];
 		}
 	}
 
