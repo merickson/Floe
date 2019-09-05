@@ -166,7 +166,8 @@ namespace Floe.UI
                         {
                             styleKey = "Topic";
                         }
-                        this.Write(styleKey, e.Message.Time, string.Format("{0} {1}", peer.Nickname, text));
+                        this.Write(styleKey, e.Message.Time, string.Format("{0} {1}", subject, text));
+                        //this.Write(styleKey, e.Message.Time, e.From.Prefix, e.Text, attn);
                     }
                     else
                     {
