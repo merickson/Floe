@@ -18,6 +18,9 @@ namespace Floe.UI
 
 		public TabsOrientationTemplate TabsOrientationTemplate { get; private set; }
 
+        // This just holds the state of SelectionChanged used to prevent SizeChange and ScrollChange on chatTreeView
+        private bool selectionChanged = false;
+
 		public ChatWindow()
 		{
 			this.Items = new ObservableCollection<ChatTabItem>();
@@ -29,11 +32,12 @@ namespace Floe.UI
 
 			this.Loaded += new RoutedEventHandler(ChatWindow_Loaded);
 			this.tabsChat.SelectionChanged += TabsChat_SelectionChanged;
-			chatTreeView.ItemsSource = NetworkTreeViewList;
+            chatTreeView.SizeChanged += ChatTreeView_SizeChanged;
+            chatTreeView.ItemsSource = NetworkTreeViewList;
 			chatTreeView.SelectedItemChanged += ChatTreeView_SelectedItemChanged;
 		}
 
-		private void TabsChat_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void TabsChat_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
 			ChatTabItem oldTabItem = null;
 			ChatTabItem newTabItem = null;
@@ -73,6 +77,7 @@ namespace Floe.UI
 
 		private void ChatTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
 		{
+            selectionChanged = true;
 			if (e.NewValue is NetworkTreeViewItem)
 			{
 				NetworkTreeViewItem newItem = (NetworkTreeViewItem)e.NewValue;
@@ -289,5 +294,24 @@ namespace Floe.UI
 			var TabStripPos = App.Settings.Current.Windows.TabStripPosition;
 			TabsOrientationTemplate.ChangeOrientation(TabStripPos);
 		}
-	}
+
+        private void ChatTreeView_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            if (selectionChanged == true)
+            {
+                e.Handled = true;
+                selectionChanged = false;
+            }
+        }
+
+        private void chatTreeView_ScrollChanged(object sender, ScrollChangedEventArgs e)
+        {
+            if (selectionChanged == true)
+            {
+                e.Handled = true;
+                ScrollViewer scrollViewer = e.OriginalSource as ScrollViewer;
+                scrollViewer.ScrollToHorizontalOffset(0.0d);
+            }
+        }
+    }
 }
