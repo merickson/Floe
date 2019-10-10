@@ -71,7 +71,9 @@ namespace Floe.UI
 				ActivityColor = "Black";
 			if (Page.NotifyState == NotifyState.NoiseActivity)
 				ActivityColor = "Blue";
-			if (Page.NotifyState == NotifyState.ChatActivity)
+            if (Page.NotifyState == NotifyState.ActionActivity)
+                ActivityColor = "Magenta";
+            if (Page.NotifyState == NotifyState.ChatActivity)
 				ActivityColor = "Red";
 			if (Page.NotifyState == NotifyState.Alert)
 				ActivityColor = "#FF00FF00";
@@ -154,7 +156,9 @@ namespace Floe.UI
 				ActivityColor = "Black";
 			if (Page.NotifyState == NotifyState.NoiseActivity)
 				ActivityColor = "Blue";
-			if (Page.NotifyState == NotifyState.ChatActivity)
+            if (Page.NotifyState == NotifyState.ActionActivity)
+                ActivityColor = "Magenta";
+            if (Page.NotifyState == NotifyState.ChatActivity)
 				ActivityColor = "Red";
 			if (Page.NotifyState == NotifyState.Alert)
 				ActivityColor = "#FF00FF00";

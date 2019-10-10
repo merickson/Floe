@@ -6,6 +6,7 @@ namespace Floe.UI
 	{
 		None,
 		NoiseActivity,
+        ActionActivity,
 		ChatActivity,
 		Alert
 	}

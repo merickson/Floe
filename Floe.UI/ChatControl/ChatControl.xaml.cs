@@ -259,9 +259,9 @@ namespace Floe.UI
             this.Write(styleKey, DateTime.Now, peer, text, attn);
         }
 
-        private void Write(string styleKey, DateTime date, string text)
+        private void Write(string styleKey, DateTime date, string text, bool attn = false)
 		{
-			this.Write(styleKey, date, 0, null, text, false);
+			this.Write(styleKey, date, 0, null, text, attn);
 		}
 
         private void Write(string styleKey, string text)

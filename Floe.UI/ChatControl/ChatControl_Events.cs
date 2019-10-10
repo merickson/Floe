@@ -371,16 +371,31 @@ namespace Floe.UI
             {
                 string text = string.Join(" ", e.Command.Arguments);
                 bool attn = false;
+                this.NotifyState = NotifyState.ActionActivity;
                 if (App.IsAttentionMatch(this.Session.Nickname, text))
                 {
                     attn = true;
                     if (_window != null)
                     {
                         Interop.WindowHelper.FlashWindow(_window);
+                        App.Alert(_window, string.Format("You received an alert from {0}", this.Target.Name));
                     }
-                }
+                    if (this.VisualParent == null)
+                    {
+                        this.NotifyState = NotifyState.Alert;
+                        App.DoEvent("inactiveAlert");
+                    }
+                    else if (_window != null && !_window.IsActive)
+                    {
+                        App.DoEvent("inactiveAlert");
+                    }
+                    else
+                    {
+                        App.DoEvent("activeAlert");
+                    }
 
-                this.Write("Action", e.Message.Time, string.Format("{0} {1}", e.From.Name, text, attn));
+                }
+                this.Write("Action", e.Message.Time, string.Format("{0} {1}", e.From.Name, text), attn);
             }
             else if (this.IsServer && e.Command.Command != "ACTION" && e.From != null)
             {
