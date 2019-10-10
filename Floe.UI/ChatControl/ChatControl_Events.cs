@@ -371,7 +371,6 @@ namespace Floe.UI
             {
                 string text = string.Join(" ", e.Command.Arguments);
                 bool attn = false;
-                this.NotifyState = NotifyState.ActionActivity;
                 if (App.IsAttentionMatch(this.Session.Nickname, text))
                 {
                     attn = true;
