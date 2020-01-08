@@ -62,13 +62,17 @@ namespace Floe.UI
 			}
 		}
 
-		private string FormatNick(string nick)
+		private string FormatNick(string nick, bool notice = false)
 		{
 			if (!this.UseTabularView)
 			{
 				if (nick == null)
 				{
 					nick = "* ";
+				}
+				else if (notice)
+				{
+					nick = string.Format("-{0}- ", nick);
 				}
 				else
 				{
@@ -101,7 +105,7 @@ namespace Floe.UI
 				var b = new Block();
 				b.Source = line;
 				b.TimeString = this.FormatTime(b.Source.Time);
-				b.NickString = this.FormatNick(b.Source.Nick);
+				b.NickString = this.FormatNick(b.Source.Nick, b.Source.ColorKey == "Notice" ? true : false);
 
 				var offset = _blocks.Last != null ? _blocks.Last.Value.CharEnd : 0;
 				b.CharStart = offset;
@@ -119,7 +123,7 @@ namespace Floe.UI
 			b.Source = line;
 
 			b.TimeString = this.FormatTime(b.Source.Time);
-			b.NickString = this.FormatNick(b.Source.Nick);
+			b.NickString = this.FormatNick(b.Source.Nick, b.Source.ColorKey == "Notice" ? true : false);
 
 			var offset = _blocks.Last != null ? _blocks.Last.Value.CharEnd : 0;
 			b.CharStart = offset;
@@ -198,7 +202,7 @@ namespace Floe.UI
 				{
 					b.CharStart = offset;
 					b.TimeString = this.FormatTime(b.Source.Time);
-					b.NickString = this.FormatNick(b.Source.Nick);
+					b.NickString = this.FormatNick(b.Source.Nick, b.Source.ColorKey == "Notice" ? true : false);
 					offset += b.TimeString.Length + b.NickString.Length + b.Source.Text.Length;
 					b.CharEnd = offset;
 				}

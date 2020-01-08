@@ -70,12 +70,10 @@ namespace Floe.UI
 			if ((this.IsServer) || (this.Target.IsChannel && this.Target.Equals(e.To)) 
 				|| (IsDefault && this.IsChannel && e.From != null && _nickList.Contains(e.From.Name)))
 			{
-				if ((e.From == null) && (this.IsServer))
-				{
-					this.Write("Notice", e.Message.Time, e.Text);
-				}
-				else
-					this.Write("Notice", e.Message.Time, e.From.Prefix, e.Text, false);
+                if ((e.From == null) && (this.IsServer))
+                    this.Write("Notice", e.Message.Time, e.Text);
+                else
+                    this.Write("Notice", e.Message.Time, e.From.Prefix, e.Text, false, e.To);
 			}
 			App.DoEvent("notice");
 		}

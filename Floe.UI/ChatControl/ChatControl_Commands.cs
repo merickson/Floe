@@ -425,6 +425,7 @@ namespace Floe.UI
 				case "N":
 					args = Split(command, arguments, 2, 2);
 					this.Session.Notice(new IrcTarget(args[0]), args[1]);
+					this.Write("Notice", string.Format("-> -{0}- {1}", args[0], args[1]));
 					break;
 				case "JOIN":
 				case "J":

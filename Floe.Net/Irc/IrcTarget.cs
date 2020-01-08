@@ -102,8 +102,11 @@ namespace Floe.Net
 		{
 			if (name.Length < 1)
 				return false;
-			else
-				return name[0] == '#' || name[0] == '+' || name[0] == '&' || name[0] == '!';
+			if (name.StartsWith("@"))
+				name = name.Substring(1);
+			if (name.Length < 1)
+				return false;
+			return name[0] == '#' || name[0] == '+' || name[0] == '&' || name[0] == '!';
 		}
 
 		/// <summary>

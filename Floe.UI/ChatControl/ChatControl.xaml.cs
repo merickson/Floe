@@ -228,32 +228,45 @@ namespace Floe.UI
             Write(styleKey, DateTime.Now, nickHashCode, nick, text, attn);
         }
 
-        private void Write(string styleKey, DateTime date, IrcPeer peer, string text, bool attn)
+        private void Write(string styleKey, DateTime date, IrcPeer peer, string text, bool attn, IrcTarget To = null)
 		{
+			string nickparam = this.GetNickWithLevel(peer.Nickname);
+			if (styleKey == "Notice")
+			{
+				nickparam = peer.Nickname;
+				if (To != null && To.IsChannel)
+					nickparam = this.GetNickWithLevel(peer.Nickname) + ":" + To.Name;
+			}
 			this.Write(styleKey, date, string.Format("{0}@{1}", peer.Username, peer.Hostname).GetHashCode(),
-				this.GetNickWithLevel(peer.Nickname), text, attn);
+				nickparam, text, attn);
 			if (!boxOutput.IsAutoScrolling)
 			{
 				App.DoEvent("beep");
 			}
 		}
 
-		private void Write(string styleKey, DateTime date, IrcServer peer, string text, bool attn)
+		private void Write(string styleKey, DateTime date, IrcServer peer, string text, bool attn, IrcTarget To = null)
 		{
+			string nickparam = peer.ServerName;
+			if (styleKey == "Notice")
+			{
+				if (To != null && To.IsChannel)
+					nickparam += ":" + To.Name;
+			}
 			this.Write(styleKey, date, string.Format("{0}", peer.ServerName).GetHashCode(),
-				this.GetNickWithLevel(peer.ServerName), text, attn);
+				nickparam, text, attn);
 			if (!boxOutput.IsAutoScrolling)
 			{
 				App.DoEvent("beep");
 			}
 		}
 
-		private void Write(string styleKey, DateTime date, IrcPrefix peer, string text, bool attn)
+		private void Write(string styleKey, DateTime date, IrcPrefix peer, string text, bool attn, IrcTarget To = null)
 		{
 			if (peer is IrcPeer)
-				this.Write(styleKey, date, (IrcPeer)peer, text, attn);
+				this.Write(styleKey, date, (IrcPeer)peer, text, attn, To);
 			else if (peer is IrcServer)
-				this.Write(styleKey, date, (IrcServer)peer, text, attn);
+				this.Write(styleKey, date, (IrcServer)peer, text, attn, To);
 			else
 				this.Write(styleKey, date, text);
 		}
