@@ -117,8 +117,19 @@ namespace Floe.Net
 		public override bool Equals(object obj)
 		{
 			var other = obj as IrcTarget;
+			string otherName = String.Empty;
+			if (other != null)
+			{
+				otherName = other.Name;
+				if (otherName.StartsWith("@"))
+					otherName = otherName.Substring(1);
+			}
+			string thisName = this.Name;
+			if (thisName.StartsWith("@"))
+				thisName = thisName.Substring(1);
+
 			return other != null && other.IsChannel == this.IsChannel &&
-				string.Compare(other.Name, this.Name, StringComparison.OrdinalIgnoreCase) == 0;
+				string.Compare(otherName, thisName, StringComparison.OrdinalIgnoreCase) == 0;
 		}
 
 		/// <summary>

@@ -67,15 +67,32 @@ namespace Floe.UI
 			{
 				return;
 			}
-			if ((this.IsServer) || (this.Target.IsChannel && this.Target.Equals(e.To)) 
-				|| (IsDefault && this.IsChannel && e.From != null && _nickList.Contains(e.From.Name)))
-			{
+
+            bool b_doNotice = false;
+
+            if (this.IsServer)
+                b_doNotice = true;
+
+            if (e.To.IsChannel)
+            {
+                if ((this.Target != null) && (this.Target.Equals(e.To)))
+                    b_doNotice = true;
+            }
+            else
+            {
+                if ((IsDefault && this.IsChannel && (e.From != null) && _nickList.Contains(e.From.Name)) 
+                    || ((e.From != null) && (this.Target != null) && this.Target.Equals(e.From))) // in case of private window is open, direct the notice there too
+                    b_doNotice = true;
+            }
+
+            if (b_doNotice)
+            {
                 if ((e.From == null) && (this.IsServer))
                     this.Write("Notice", e.Message.Time, e.Text);
                 else
-                    this.Write("Notice", e.Message.Time, e.From.Prefix, e.Text, false, e.To);
-			}
-			App.DoEvent("notice");
+                    this.Write("Notice", e.Message.Time, e.From.Prefix, e.Text, false, e.To); 
+            }
+            App.DoEvent("notice");
 		}
 
 		private void Session_PrivateMessaged(object sender, IrcMessageEventArgs e)
