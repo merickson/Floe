@@ -63,10 +63,5 @@ namespace Floe.UI.Settings
 			txtName.Text = server.Name;
 			lstServers.Items.Refresh();
 		}
-
-		private void checkBox1_Checked(object sender, RoutedEventArgs e)
-		{
-
-		}
 	}
 }

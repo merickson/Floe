@@ -6,71 +6,135 @@
 			 xmlns:local="clr-namespace:Floe.UI"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="384">
-	<UserControl.Resources>
-		<ToolTip x:Key="ttOnConnect">Specifies a sequence of commands (one per line) to execute on successful connection. Can be used to authenticate or join channels.</ToolTip>
-		<Style TargetType="{x:Type Label}">
-			<Setter Property="Padding" Value="0"/>
-		</Style>
-	</UserControl.Resources>
-	<Canvas>
-		<ListBox Canvas.Left="12" Canvas.Top="41" Height="247" Name="lstServers" Width="138" ItemsSource="{Binding Source={x:Static local:App.Settings}, Path=Current.Servers}" DisplayMemberPath="Name" Style="{DynamicResource styleSmallListBox}" IsEnabled="True" ScrollViewer.HorizontalScrollBarVisibility="Disabled" />
-		<Button Canvas.Left="12" Canvas.Top="12" Content="New" Height="23" Name="btnNew" Width="58" Click="btnNew_Click" />
-		<Button Canvas.Left="88" Canvas.Top="12" Content="Delete" Height="23" Name="btnDelete" Width="62" Click="btnDelete_Click">
-			<Button.Style>
-				<Style TargetType="Button">
-					<Style.Triggers>
-						<DataTrigger Binding="{Binding ElementName=lstServers, Path=Items.Count}" Value="1">
-							<Setter Property="Button.IsEnabled" Value="False"/>
-						</DataTrigger>
-					</Style.Triggers>
-				</Style>
-			</Button.Style>
-		</Button>
-		<Label Canvas.Left="166" Canvas.Top="12" Content="Description" Height="18" Name="label1" />
-		<TextBox Canvas.Left="165" Canvas.Top="29" Height="23" Name="txtName" Width="139" SourceUpdated="txtName_SourceUpdated">
-			<TextBox.Text>
-				<Binding ElementName="lstServers" Path="SelectedItem.Name" Mode="TwoWay" NotifyOnSourceUpdated="True">
-					<Binding.ValidationRules>
-						<ExceptionValidationRule/>
-					</Binding.ValidationRules>
-				</Binding>
-			</TextBox.Text>
-		</TextBox>
-		<Label Canvas.Left="166" Canvas.Top="55" Content="Server" Height="18" Name="label2" />
-		<TextBox Canvas.Left="166" Canvas.Top="71" Height="23" Name="txtHostname" Width="138">
-			<TextBox.Text>
-				<Binding ElementName="lstServers" Path="SelectedItem.Hostname" Mode="TwoWay" NotifyOnSourceUpdated="True">
-					<Binding.ValidationRules>
-						<ExceptionValidationRule/>
-					</Binding.ValidationRules>
-				</Binding>
-			</TextBox.Text>
-		</TextBox>
-		<Label Canvas.Left="310" Canvas.Top="74" Content=":" Height="18" Name="label3" Width="9"/>
-		<TextBox Canvas.Left="320" Canvas.Top="71" Height="23" Name="txtPort" Width="52">
-			<TextBox.Text>
-				<Binding ElementName="lstServers" Path="SelectedItem.Port" Mode="TwoWay" NotifyOnSourceUpdated="True">
-					<Binding.ValidationRules>
-						<ExceptionValidationRule/>
-					</Binding.ValidationRules>
-				</Binding>
-			</TextBox.Text>
-		</TextBox>
-		<CheckBox Canvas.Left="320" Canvas.Top="55" Content="SSL" Height="16" IsChecked="{Binding ElementName=lstServers, Path=SelectedItem.IsSecure, Mode=TwoWay}" Name="chkSsl" Width="52" />
-		<CheckBox Canvas.Left="165" Canvas.Top="100" Content="Connect On Startup" Height="16" Name="chkConnectOnStartup" IsChecked="{Binding ElementName=lstServers, Path=SelectedItem.ConnectOnStartup, Mode=TwoWay}"/>
-		<CheckBox Canvas.Left="165" Canvas.Top="122" Content="Auto Reconnect" Height="16" Name="chkAutoReconnect" IsChecked="{Binding ElementName=lstServers, Path=SelectedItem.AutoReconnect, Mode=TwoWay}"/>
-		<Label ToolTip="{StaticResource ttOnConnect}" Canvas.Left="166" Canvas.Top="143" Content="On Connect:" Height="28" Name="label4" />
-		<TextBox Canvas.Left="301" Canvas.Top="115" Height="23" Name="textBox1" Width="71">
-			<Binding ElementName="lstServers" Mode="TwoWay" NotifyOnSourceUpdated="True" Path="SelectedItem.Password">
-				<Binding.ValidationRules>
-					<ExceptionValidationRule />
-				</Binding.ValidationRules>
-			</Binding>
-		</TextBox>
-		<TextBox ToolTip="{StaticResource ttOnConnect}" Canvas.Left="165" Canvas.Top="159" Height="98" Name="txtOnConnect" Width="207" Text="{Binding ElementName=lstServers, Path=SelectedItem.OnConnect}" AcceptsReturn="True" />
-		<Label Canvas.Left="301" Canvas.Top="100" Content="Password" Height="18" Name="label5" />
-		<TextBlock Canvas.Left="165" Canvas.Top="260" Height="40" Name="label6" Width="207" TextWrapping="Wrap">
-			Tip: Use "/delay N" to delay N seconds between commands.
-		</TextBlock>
-	</Canvas>
+    <UserControl.Resources>
+        <ToolTip x:Key="ttOnConnect">Specifies a sequence of commands (one per line) to execute on successful connection. Can be used to authenticate or join channels.
+            Tip: Use "/delay N" to delay N seconds between commands.</ToolTip>
+        <Style TargetType="{x:Type Label}">
+            <Setter Property="Padding" Value="0"/>
+        </Style>
+        <local:InverseBooleanConverter x:Key="invBooleanConverter"/>
+        <local:InverseNulleableBooleanConverter x:Key="invNullBooleanConverter"/>
+        <local:ProxySettingsConverter x:Key="pxySettingsConverter"/>
+    </UserControl.Resources>
+    <Canvas>
+        <ListBox Canvas.Left="12" Canvas.Top="41" Height="249" Name="lstServers" Width="125" ItemsSource="{Binding Source={x:Static local:App.Settings}, Path=Current.Servers}" DisplayMemberPath="Name" Style="{DynamicResource styleSmallListBox}" IsEnabled="True" ScrollViewer.HorizontalScrollBarVisibility="Disabled"/>
+        <Button Canvas.Left="12" Canvas.Top="12" Content="New" Height="23" Name="btnNew" Width="58" Click="btnNew_Click" />
+        <Button Canvas.Left="75" Canvas.Top="12" Content="Delete" Height="23" Name="btnDelete" Width="62" Click="btnDelete_Click">
+            <Button.Style>
+                <Style TargetType="Button">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding ElementName=lstServers, Path=Items.Count}" Value="1">
+                            <Setter Property="Button.IsEnabled" Value="False"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Button.Style>
+        </Button>
+        <TabControl x:Name="tabSettings" Canvas.Left="142" Canvas.Top="12" Height="278" Width="242">
+            <TabItem Header="Session">
+                <Canvas>
+                    <Label Canvas.Left="10" Canvas.Top="5" Content="Description" Height="18" Name="label1" />
+                    <TextBox Canvas.Left="10" Canvas.Top="23" Height="23" Name="txtName" SourceUpdated="txtName_SourceUpdated" Width="145">
+                        <TextBox.Text>
+                            <Binding ElementName="lstServers" Path="SelectedItem.Name" Mode="TwoWay" NotifyOnSourceUpdated="True">
+                                <Binding.ValidationRules>
+                                    <ExceptionValidationRule/>
+                                </Binding.ValidationRules>
+                            </Binding>
+                        </TextBox.Text>
+                    </TextBox>
+                    <Label Canvas.Left="10" Canvas.Top="51" Content="Server" Height="18" Name="label2" />
+                    <Label Content=":" Height="18" x:Name="label3" Width="9" Canvas.Left="160" Canvas.Top="69"/>
+                    <TextBox Height="23" x:Name="txtHostname" Canvas.Left="10" Width="145" Canvas.Top="69">
+                        <Binding ElementName="lstServers" Path="SelectedItem.Hostname" Mode="TwoWay" NotifyOnSourceUpdated="True">
+                            <Binding.ValidationRules>
+                                <ExceptionValidationRule/>
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox>
+                    <TextBox Canvas.Left="174" Canvas.Top="69" Height="23" Name="txtPort" Width="52">
+                        <TextBox.Text>
+                            <Binding ElementName="lstServers" Path="SelectedItem.Port" Mode="TwoWay" NotifyOnSourceUpdated="True">
+                                <Binding.ValidationRules>
+                                    <ExceptionValidationRule/>
+                                </Binding.ValidationRules>
+                            </Binding>
+                        </TextBox.Text>
+                    </TextBox>
+                    <CheckBox Canvas.Left="174" Canvas.Top="51" Content="SSL" Height="16" IsChecked="{Binding ElementName=lstServers, Path=SelectedItem.IsSecure, Mode=TwoWay}" Name="chkSsl" Width="52" />
+                    <CheckBox Canvas.Left="10" Canvas.Top="101" Content="Connect On Startup" Height="16" Name="chkConnectOnStartup" IsChecked="{Binding ElementName=lstServers, Path=SelectedItem.ConnectOnStartup, Mode=TwoWay}"/>
+                    <CheckBox Canvas.Left="10" Canvas.Top="122" Content="Auto Reconnect" Height="16" Name="chkAutoReconnect" IsChecked="{Binding ElementName=lstServers, Path=SelectedItem.AutoReconnect, Mode=TwoWay}"/>
+                    <Label ToolTip="{StaticResource ttOnConnect}" Canvas.Left="10" Canvas.Top="143" Content="On Connect:" Height="28" Name="label4" />
+                    <TextBox Canvas.Left="137" Canvas.Top="115" Height="23" Name="txtBoxPassw" Width="99">
+                        <Binding ElementName="lstServers" Mode="TwoWay" NotifyOnSourceUpdated="True" Path="SelectedItem.Password">
+                            <Binding.ValidationRules>
+                                <ExceptionValidationRule />
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox>
+                    <TextBox ToolTip="{StaticResource ttOnConnect}" Canvas.Top="159" Height="91" Name="txtOnConnect" Width="236" Text="{Binding ElementName=lstServers, Path=SelectedItem.OnConnect}" AcceptsReturn="True" />
+                    <Label Canvas.Left="151" Canvas.Top="100" Content="Password" Height="18" Name="label5" />
+                    <!--<TextBlock Canvas.Left="10" Canvas.Top="273" Height="40" Name="label6" Width="207" TextWrapping="Wrap">
+			            Tip: Use "/delay N" to delay N seconds between commands.
+                    </TextBlock>-->
+                </Canvas>
+            </TabItem>
+            <TabItem Header="Network">
+                <Canvas>
+                    <CheckBox Content="Use Global SOCKS5 proxy settings" Height="16" x:Name="chkGlobalProxy" IsChecked="{Binding SelectedItem.UseGlobalProxySettings, ElementName=lstServers, Mode=TwoWay}" Canvas.Left="10" Canvas.Top="10"/>
+                    <CheckBox Content="Use this SOCKS5 proxy settings" Height="16" x:Name="chkProxy" IsChecked="{Binding SelectedItem.UseProxySettings, ElementName=lstServers, Mode=TwoWay}" IsEnabled="{Binding IsChecked, ElementName=chkGlobalProxy, Mode=OneWay, Converter={StaticResource invBooleanConverter}}" Canvas.Left="10" Canvas.Top="35"/>
+                    <TextBlock Canvas.Left="10" Canvas.Top="60" Height="23" x:Name="textBlock1" Text="Proxy Server:" Width="116" />
+                    <!--Note: ProxyHostname and ProxyPort is with Triggers method-->
+                    <TextBox Canvas.Left="10" Canvas.Top="80" Height="23" x:Name="txtProxyHostname" Width="159" ToolTip="The hostname or IP address of your proxy server."
+                        IsEnabled="{Binding IsChecked, ElementName=chkGlobalProxy, Mode=OneWay, Converter={StaticResource invBooleanConverter}}">
+                            <TextBox.Style>
+                                <Style TargetType="TextBox">
+                                <Setter Property="Text" Value="{Binding SelectedItem.ProxyHostname, ElementName=lstServers, Mode=TwoWay, NotifyOnSourceUpdated=True}"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ElementName=chkGlobalProxy, Path=IsChecked}" Value="True">
+                                            <Setter Property="Text" Value="{Binding Source={x:Static local:App.Settings}, Path=Current.Network.ProxyHostname, Mode=TwoWay, NotifyOnSourceUpdated=True}"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBox.Style>
+                    </TextBox>
+                    <Label Canvas.Left="174" Canvas.Top="80" Content=":" Height="23" x:Name="LabelColon" Width="19" />
+                    <TextBox Canvas.Left="182" Canvas.Top="80" Height="23" x:Name="txtProxyPort" ToolTip="The port that your proxy listens on." Width="44"
+				     IsEnabled="{Binding IsChecked, ElementName=chkGlobalProxy, Mode=OneWay, Converter={StaticResource invBooleanConverter}}">
+                        <TextBox.Style>
+                            <Style TargetType="TextBox">
+                                <Setter Property="Text" Value="{Binding SelectedItem.ProxyPort, ElementName=lstServers, Mode=TwoWay, NotifyOnSourceUpdated=True}"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ElementName=chkGlobalProxy, Path=IsChecked}" Value="True">
+                                        <Setter Property="Text" Value="{Binding Source={x:Static local:App.Settings}, Path=Current.Network.ProxyPort, Mode=TwoWay, NotifyOnSourceUpdated=True}"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBox.Style>
+                    </TextBox>
+                    <TextBlock Canvas.Left="10" Canvas.Top="106" Height="23" x:Name="textBlock2" Text="Username" Width="116" />
+                    <!--Note: ProxyUsername and ProxyPassword is with Converters method-->
+                    <TextBox Canvas.Left="10" Canvas.Top="125" Height="23" x:Name="txtProxyUsername" Width="107" IsEnabled="{Binding IsChecked, ElementName=chkGlobalProxy, Mode=OneWay, Converter={StaticResource invBooleanConverter}}">
+                        <TextBox.Text>
+                            <MultiBinding Converter="{StaticResource pxySettingsConverter}">
+                                <Binding Source="{x:Static local:App.Settings}" Path="Current.Network.ProxyUsername"/>
+                                <Binding Path="SelectedItem.ProxyUsername" ElementName="lstServers" Mode="TwoWay" NotifyOnSourceUpdated="True"/>
+                                <Binding Path="IsChecked" ElementName="chkGlobalProxy" Converter="{StaticResource invNullBooleanConverter}"/>
+                            </MultiBinding>
+                        </TextBox.Text>
+                    </TextBox>
+                    <TextBlock Canvas.Left="122" Canvas.Top="106" Height="23" x:Name="textBlock3" Text="Password" Width="105" />
+                    <TextBox Canvas.Left="122" Canvas.Top="125" Height="23" x:Name="txtProxyPassword" Width="104" IsEnabled="{Binding IsChecked, ElementName=chkGlobalProxy, Mode=OneWay, Converter={StaticResource invBooleanConverter}}">
+                        <TextBox.Text>
+                            <MultiBinding Converter="{StaticResource pxySettingsConverter}">
+                                <Binding Source="{x:Static local:App.Settings}" Path="Current.Network.ProxyPassword"/>
+                                <Binding Path="SelectedItem.ProxyPassword" ElementName="lstServers" Mode="TwoWay" NotifyOnSourceUpdated="True"/>
+                                <Binding Path="IsChecked" ElementName="chkGlobalProxy" Converter="{StaticResource invNullBooleanConverter}"/>
+                            </MultiBinding>
+                        </TextBox.Text>
+                    </TextBox>
+                </Canvas>
+            </TabItem>
+        </TabControl>
+    </Canvas>
 </UserControl>

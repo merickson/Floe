@@ -151,11 +151,23 @@ namespace Floe.UI
 		{
 			this.Session.AutoReconnect = false;
 			this.Perform = server.OnConnect;
-			this.Connect(server.Name, server.Hostname, server.Port, server.IsSecure, server.AutoReconnect, server.Password);
+			ProxyInfo proxyInfo = null;
+			if (!server.UseGlobalProxySettings && server.UseProxySettings)
+			{
+				proxyInfo = new ProxyInfo(server.ProxyHostname, server.ProxyPort, server.ProxyUsername, server.ProxyPassword);
+			}
+			else if (server.UseGlobalProxySettings)
+			{
+				proxyInfo = App.ProxyInfo;
+			}
+			this.Connect(server.Name, server.Hostname, server.Port, server.IsSecure, server.AutoReconnect, server.Password, proxyInfo);
 		}
 
-		public void Connect(string sessionName, string server, int port, bool useSsl, bool autoReconnect, string password)
+		public void Connect(string sessionName, string server, int port, bool useSsl, bool autoReconnect, string password, ProxyInfo proxyInfo = null, bool useGlobalProxySettings = false)
 		{
+			if (useGlobalProxySettings)
+				proxyInfo = App.ProxyInfo;
+
 			this.Session.Open(sessionName, server, port, useSsl,
 				!string.IsNullOrEmpty(this.Session.Nickname) ?
 					this.Session.Nickname : App.Settings.Current.User.Nickname,
@@ -165,7 +177,7 @@ namespace Floe.UI
 				password,
 				App.Settings.Current.User.Invisible,
 				App.Settings.Current.Dcc.FindExternalAddress,
-				App.ProxyInfo);
+				proxyInfo);
 		}
 
 		private void ParseInput(string text)

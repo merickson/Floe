@@ -603,7 +603,7 @@ namespace Floe.UI
 							this.Session.Quit("Changing servers");
 						}
 						this.Perform = "";
-						this.Connect(null, args[0], port, useSsl, false, password);
+						this.Connect(null, args[0], port, useSsl, false, password, useGlobalProxySettings: true);
 					}
 					break;
 				case "ME":
