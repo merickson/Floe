@@ -1,354 +1,39 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{AC54B841-CB6D-44A0-88C0-EC6ECC0E190C}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Floe.UI</RootNamespace>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UseWPF>true</UseWPF>
     <AssemblyName>Floe</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
-    <FileAlignment>512</FileAlignment>
-    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <WarningLevel>4</WarningLevel>
+    <ApplicationIcon>App.ico</ApplicationIcon>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-    <PlatformTarget>x86</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <PlatformTarget>x86</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
-  </PropertyGroup>
-  <PropertyGroup>
-    <AssemblyOriginatorKeyFile>..\Floe.snk</AssemblyOriginatorKeyFile>
-  </PropertyGroup>
-  <PropertyGroup>
-    <ApplicationIcon>Resources\App.ico</ApplicationIcon>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\x64\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
-    <OutputPath>bin\x64\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="PresentationFramework.Aero" />
-    <Reference Include="System" />
-    <Reference Include="System.configuration" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Xaml" />
-    <Reference Include="System.Xml" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="WindowsBase" />
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
+    <None Remove="Resources\App.ico" />
+    <None Remove="Resources\GreenBubble.ico" />
+    <None Remove="Resources\Help.txt" />
+    <None Remove="Resources\RedBubble.ico" />
+    <None Remove="Resources\TealBubble.ico" />
   </ItemGroup>
-  <ItemGroup>
-    <ApplicationDefinition Include="Application\App.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </ApplicationDefinition>
-    <Compile Include="Application\App_Ignore.cs" />
-    <Compile Include="Application\App_Interface.cs" />
-    <Compile Include="Application\App_Logging.cs" />
-    <Compile Include="Application\App_Patterns.cs" />
-    <Compile Include="Application\App_Resources.cs" />
-    <Compile Include="Application\App_Sounds.cs" />
-    <Compile Include="Application\Enums.cs" />
-    <Compile Include="ChannelWindow\ChannelWindow.xaml.cs">
-      <DependentUpon>ChannelWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="ChannelWindow\ChannelWindow_Commands.cs" />
-    <Compile Include="ChannelWindow\ChannelWindow_WndProc.cs" />
-    <Compile Include="ChatBox\ChatBox.cs" />
-    <Compile Include="ChatBox\ChatBoxBase.cs" />
-    <Compile Include="ChatBox\ChatDecoration.cs" />
-    <Compile Include="ChatBox\ChatFormatter.cs" />
-    <Compile Include="ChatBox\ChatLine.cs" />
-    <Compile Include="ChatBox\ChatPresenter.cs" />
-    <Compile Include="ChatBox\ChatPresenter_Rendering.cs" />
-    <Compile Include="ChatBox\ChatPresenter_Scrolling.cs" />
-    <Compile Include="ChatBox\ChatPresenter_Searching.cs" />
-    <Compile Include="ChatBox\ChatPresenter_Selecting.cs" />
-    <Compile Include="ChatBox\ClipboardHelper.cs" />
-    <Compile Include="ChatBox\Constants.cs" />
-    <Compile Include="ChatBox\Enums.cs" />
-    <Compile Include="ChatControl\ChanNameComplete.cs" />
-    <Compile Include="ChatControl\ChatControl.xaml.cs">
-      <DependentUpon>ChatControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="ChatControl\ChatControl_ChannelList.cs" />
-    <Compile Include="ChatControl\ChatControl_Commands.cs" />
-    <Compile Include="ChatControl\ChatControl_Dcc.cs" />
-    <Compile Include="ChatControl\ChatControl_Events.cs" />
-    <Compile Include="ChatControl\ChatControl_NickList.cs" />
-    <Compile Include="ChatControl\ChatControl_Slap.cs" />
-    <Compile Include="ChatControl\NicknameComplete.cs" />
-    <Compile Include="ChatControl\NicknameItem.cs" />
-    <Compile Include="ChatControl\NicknameList.cs" />
-    <Compile Include="ChatControl\NotifyState.cs" />
-    <Compile Include="ChatWindow\ChatPage.cs" />
-    <Compile Include="ChatWindow\ChatTabItem.cs" />
-    <Compile Include="ChatWindow\ChatWindow_Commands.cs" />
-    <Compile Include="ChatWindow\ChatWindow_Dcc.cs" />
-    <Compile Include="ChatWindow\ChatWindow_Events.cs" />
-    <Compile Include="ChatWindow\ChatWindow.xaml.cs">
-      <DependentUpon>ChatWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="ChatWindow\ChatWindow_TabsOrientationTemplating.cs" />
-    <Compile Include="ChatWindow\ChatWindow_TreeView.cs" />
-    <Compile Include="ChatWindow\ChatWindow_WndProc.cs" />
-    <Compile Include="ChatWindow\ChatWindow_OverlayIcon.cs" />
-    <Compile Include="Converters.cs" />
-    <Compile Include="DebugControl\DebugControl.xaml.cs">
-      <DependentUpon>DebugControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\ConfirmDialog.xaml.cs">
-      <DependentUpon>ConfirmDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="FileControl\Enums.cs" />
-    <Compile Include="FileControl\FileControl.xaml.cs">
-      <DependentUpon>FileControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="FileControl\FileControl_Properties.cs" />
-    <Compile Include="HsvColor.cs" />
-    <Compile Include="InfoWindows\ChannelInfoWindow.xaml.cs">
-      <DependentUpon>ChannelInfoWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="InfoWindows\UserInfoWindow.xaml.cs">
-      <DependentUpon>UserInfoWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Interop\ColorPicker.cs" />
-    <Compile Include="Interop\FolderBrowser.cs" />
-    <Compile Include="Interop\NotifyIcon.cs" />
-    <Compile Include="Interop\WindowConstants.cs" />
-    <Compile Include="Interop\WindowHelper.cs" />
-    <Compile Include="ListControl\ListControl.xaml.cs">
-      <DependentUpon>ListControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Settings\BufferSettingsControl.xaml.cs">
-      <DependentUpon>BufferSettingsControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Settings\ColorsSettingsControl.xaml.cs">
-      <DependentUpon>ColorsSettingsControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Settings\NetworkSettingsControl.xaml.cs">
-      <DependentUpon>NetworkSettingsControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Settings\SoundSettingsControl.xaml.cs">
-      <DependentUpon>SoundSettingsControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Settings\DccSettingsControl.xaml.cs">
-      <DependentUpon>DccSettingsControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Settings\WindowSettingsControl.xaml.cs">
-      <DependentUpon>WindowSettingsControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Settings\FormattingSettingsControl.xaml.cs">
-      <DependentUpon>FormattingSettingsControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Settings\ServerSettingsControl.xaml.cs">
-      <DependentUpon>ServerSettingsControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Settings\SettingsWindow.xaml.cs">
-      <DependentUpon>SettingsWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Settings\UserSettingsControl.xaml.cs">
-      <DependentUpon>UserSettingsControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Application\App.xaml.cs">
-      <DependentUpon>App.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Page Include="ChannelWindow\ChannelWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="ChatControl\ChatControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="ChatWindow\ChatWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="DebugControl\DebugControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Dialogs\ConfirmDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="FileControl\FileControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="InfoWindows\ChannelInfoWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="InfoWindows\UserInfoWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="ListControl\ListControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Settings\BufferSettingsControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Settings\ColorsSettingsControl.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Settings\NetworkSettingsControl.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Settings\SoundSettingsControl.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Settings\DccSettingsControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Settings\WindowSettingsControl.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Settings\FormattingSettingsControl.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Settings\ServerSettingsControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Settings\SettingsWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Settings\UserSettingsControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Themes\Generic.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Properties\AssemblyInfo.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <None Include="app.config" />
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-    <AppDesigner Include="Properties\" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Floe.Configuration\Floe.Configuration.csproj">
-      <Project>{75037294-D6D4-42B0-AF4B-FE2F438D0670}</Project>
-      <Name>Floe.Configuration</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Floe.Net\Floe.Net.csproj">
-      <Project>{1D4AD463-4355-4DA6-B8E6-0E8BB75B50D9}</Project>
-      <Name>Floe.Net</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\Help.txt" />
-  </ItemGroup>
+
   <ItemGroup>
     <EmbeddedResource Include="Resources\App.ico" />
+    <EmbeddedResource Include="Resources\GreenBubble.ico" />
+    <EmbeddedResource Include="Resources\Help.txt" />
+    <EmbeddedResource Include="Resources\RedBubble.ico" />
+    <EmbeddedResource Include="Resources\TealBubble.ico" />
   </ItemGroup>
+
   <ItemGroup>
-    <Resource Include="Resources\GreenBubble.ico" />
+    <PackageReference Include="System.Drawing.Common" Version="4.7.0" />
   </ItemGroup>
+
   <ItemGroup>
-    <Resource Include="Resources\TealBubble.ico" />
+    <ProjectReference Include="..\Floe.Configuration\Floe.Configuration.csproj" />
+    <ProjectReference Include="..\Floe.Net\Floe.Net.csproj" />
   </ItemGroup>
+
   <ItemGroup>
-    <Resource Include="Resources\RedBubble.ico" />
+    <ApplicationDefinition Include="Application\App.xaml"></ApplicationDefinition>
   </ItemGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

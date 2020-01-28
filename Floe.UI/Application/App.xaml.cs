@@ -4,8 +4,8 @@ using Floe.Net;
 
 namespace Floe.UI
 {
-    public partial class App : Application
-    {
+	public partial class App : Application
+	{
 		public App()
 		{
 			AppDomain.CurrentDomain.UnhandledException += (sender, e) =>
