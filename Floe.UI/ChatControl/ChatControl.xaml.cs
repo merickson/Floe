@@ -7,6 +7,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using Floe.Net;
 using System.Threading;
+using System.Text;
 
 namespace Floe.UI
 {
@@ -24,7 +25,7 @@ namespace Floe.UI
 
 		#endregion
 
-		private const double MinNickListWidth = 50.0;
+		private const double MinNickListWidth = 100.0;
 
 		private LinkedList<string> _history;
 		private LinkedListNode<string> _historyNode;
@@ -38,6 +39,7 @@ namespace Floe.UI
 		{
 			_history = new LinkedList<string>();
 			_nickList = new NicknameList();
+			InvitesList = new ObservableCollection<InviteItem>();
 
 			InitializeComponent();
 
@@ -75,8 +77,11 @@ namespace Floe.UI
 							if (e.Message.Parameters.Count > 2 &&
 								this.Target.Equals(new IrcTarget(e.Message.Parameters[1])))
 							{
-								_channelModes = e.Message.Parameters[2].ToCharArray().Where((c) => c != '+').ToArray();
-								this.SetTitle();
+                                string _chModes = e.Message.Parameters[2];
+                                for (int i = 3; i < e.Message.Parameters.Count; i++)
+                                    _chModes += " " + e.Message.Parameters[i];
+                                _channelModes = _chModes.ToCharArray().Where((c) => c != '+').ToArray();
+                                this.SetTitle();
 							}
 							e.Handled = true;
 							return true;
@@ -124,8 +129,6 @@ namespace Floe.UI
 			boxOutput.ContextMenu = this.GetDefaultContextMenu();
 		}
 
-		public bool IsChannel { get { return this.Type == ChatPageType.Chat && this.Target.IsChannel; } }
-		public bool IsNickname { get { return this.Type == ChatPageType.Chat && !this.Target.IsChannel; } }
 		public string Perform { get; set; }
 
 		public static readonly DependencyProperty IsConnectedProperty =
@@ -148,11 +151,23 @@ namespace Floe.UI
 		{
 			this.Session.AutoReconnect = false;
 			this.Perform = server.OnConnect;
-			this.Connect(server.Name, server.Hostname, server.Port, server.IsSecure, server.AutoReconnect, server.Password);
+			ProxyInfo proxyInfo = null;
+			if (!server.UseGlobalProxySettings && server.UseProxySettings)
+			{
+				proxyInfo = new ProxyInfo(server.ProxyHostname, server.ProxyPort, server.ProxyUsername, server.ProxyPassword);
+			}
+			else if (server.UseGlobalProxySettings)
+			{
+				proxyInfo = App.ProxyInfo;
+			}
+			this.Connect(server.Name, server.Hostname, server.Port, server.IsSecure, server.AutoReconnect, server.Password, proxyInfo);
 		}
 
-		public void Connect(string sessionName, string server, int port, bool useSsl, bool autoReconnect, string password)
+		public void Connect(string sessionName, string server, int port, bool useSsl, bool autoReconnect, string password, ProxyInfo proxyInfo = null, bool useGlobalProxySettings = false)
 		{
+			if (useGlobalProxySettings)
+				proxyInfo = App.ProxyInfo;
+
 			this.Session.Open(sessionName, server, port, useSsl,
 				!string.IsNullOrEmpty(this.Session.Nickname) ?
 					this.Session.Nickname : App.Settings.Current.User.Nickname,
@@ -162,7 +177,7 @@ namespace Floe.UI
 				password,
 				App.Settings.Current.User.Invisible,
 				App.Settings.Current.Dcc.FindExternalAddress,
-				App.ProxyInfo);
+				proxyInfo);
 		}
 
 		private void ParseInput(string text)
@@ -197,12 +212,16 @@ namespace Floe.UI
 					// Activity in PM window
 					this.NotifyState = NotifyState.Alert;
 				}
-				else if (!string.IsNullOrEmpty(nick) && this.NotifyState != NotifyState.Alert)
+                else if (!string.IsNullOrEmpty(nick) && this.NotifyState != NotifyState.Alert)
 				{
 					// Chat activity in channel
 					this.NotifyState = NotifyState.ChatActivity;
 				}
-				else if (this.NotifyState == NotifyState.None)
+                else if ((styleKey == "Action") && (this.NotifyState != NotifyState.Alert))
+                {
+                    this.NotifyState = NotifyState.ActionActivity;
+                }
+                else if (this.NotifyState == NotifyState.None)
 				{
 					// Other activity in channel / server
 					this.NotifyState = NotifyState.NoiseActivity;
@@ -221,24 +240,57 @@ namespace Floe.UI
             Write(styleKey, DateTime.Now, nickHashCode, nick, text, attn);
         }
 
-        private void Write(string styleKey, DateTime date, IrcPeer peer, string text, bool attn)
+        private void Write(string styleKey, DateTime date, IrcPeer peer, string text, bool attn, IrcTarget To = null)
 		{
+			string nickparam = this.GetNickWithLevel(peer.Nickname);
+			if (styleKey == "Notice")
+			{
+				nickparam = peer.Nickname;
+				if (To != null && To.IsChannel)
+					nickparam = this.GetNickWithLevel(peer.Nickname) + ":" + To.Name;
+			}
 			this.Write(styleKey, date, string.Format("{0}@{1}", peer.Username, peer.Hostname).GetHashCode(),
-				this.GetNickWithLevel(peer.Nickname), text, attn);
+				nickparam, text, attn);
 			if (!boxOutput.IsAutoScrolling)
 			{
 				App.DoEvent("beep");
 			}
 		}
 
-        private void Write(string styleKey, IrcPeer peer, string text, bool attn)
+		private void Write(string styleKey, DateTime date, IrcServer peer, string text, bool attn, IrcTarget To = null)
+		{
+			string nickparam = peer.ServerName;
+			if (styleKey == "Notice")
+			{
+				if (To != null && To.IsChannel)
+					nickparam += ":" + To.Name;
+			}
+			this.Write(styleKey, date, string.Format("{0}", peer.ServerName).GetHashCode(),
+				nickparam, text, attn);
+			if (!boxOutput.IsAutoScrolling)
+			{
+				App.DoEvent("beep");
+			}
+		}
+
+		private void Write(string styleKey, DateTime date, IrcPrefix peer, string text, bool attn, IrcTarget To = null)
+		{
+			if (peer is IrcPeer)
+				this.Write(styleKey, date, (IrcPeer)peer, text, attn, To);
+			else if (peer is IrcServer)
+				this.Write(styleKey, date, (IrcServer)peer, text, attn, To);
+			else
+				this.Write(styleKey, date, text);
+		}
+
+		private void Write(string styleKey, IrcPeer peer, string text, bool attn)
         {
             this.Write(styleKey, DateTime.Now, peer, text, attn);
         }
 
-        private void Write(string styleKey, DateTime date, string text)
+        private void Write(string styleKey, DateTime date, string text, bool attn = false)
 		{
-			this.Write(styleKey, date, 0, null, text, false);
+			this.Write(styleKey, date, 0, null, text, attn);
 		}
 
         private void Write(string styleKey, string text)
@@ -268,7 +320,7 @@ namespace Floe.UI
 				case ChatPageType.Server:
 					if (this.Session.State == IrcSessionState.Disconnected)
 					{
-						this.Title = string.Format("{0} - Not Connected", App.Product);
+						this.Title = string.Format("{0} - {1} - Not Connected", App.Product, this.Session.Nickname);
 					}
 					else
 					{
@@ -280,8 +332,8 @@ namespace Floe.UI
 				default:
 					if (this.Target.IsChannel)
 					{
-						this.Title = string.Format("{0} - {1} ({2}) on {3} - {4} ({5}) - {6}", App.Product, this.Session.Nickname,
-							userModes, this.Session.NetworkName, this.Target.ToString(), channelModes, _topic);
+						this.Title = string.Format("{0} - {1} ({2}) on {3} - {4} ({5}) ({6}) - {7}", App.Product, this.Session.Nickname,
+							userModes, this.Session.NetworkName, this.Target.ToString(), _nickList.Count, channelModes, _topic);
 					}
 					else
 					{
@@ -321,10 +373,15 @@ namespace Floe.UI
 				}
 				return menu;
 			}
-			else
+			else if (this.IsChannel)
 			{
 				return this.Resources["cmChannel"] as ContextMenu;
 			}
+			else if (this.IsNickname)
+			{
+				return this.Resources["cmUser"] as ContextMenu;
+			}
+			return null;
 		}
 
 		public override void Dispose()

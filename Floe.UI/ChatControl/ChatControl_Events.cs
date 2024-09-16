@@ -5,6 +5,9 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using Floe.Net;
 using System.Windows.Documents;
+using System.Text;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace Floe.UI
 {
@@ -15,6 +18,7 @@ namespace Floe.UI
         private bool _hasDeactivated = false, _usingAlternateNick = false;
         private Tuple<int, string> tabData = Tuple.Create(0, "");
         private Window _window;
+		public ObservableCollection<InviteItem> InvitesList;
 
         private void Session_StateChanged(object sender, EventArgs e)
         {
@@ -57,30 +61,43 @@ namespace Floe.UI
             }
         }
 
-        private void Session_Noticed(object sender, IrcMessageEventArgs e)
-        {
-            if (App.IsIgnoreMatch(e.From, IgnoreActions.Notice))
-            {
-                return;
-            }
+		private void Session_Noticed(object sender, IrcMessageEventArgs e)
+		{
+			if (App.IsIgnoreMatch(e.From.Prefix, IgnoreActions.Notice))
+			{
+				return;
+			}
+
+            bool b_doNotice = false;
 
             if (this.IsServer)
-            {
-                if (e.From is IrcPeer)
-                {
-                    this.Write("Notice", e.Message.Time, (IrcPeer)e.From, e.Text, false);
-                }
-                else if (this.IsServer)
-                {
-                    this.Write("Notice", e.Message.Time, e.Text);
-                }
-                App.DoEvent("notice");
-            }
-        }
+                b_doNotice = true;
 
-        private void Session_PrivateMessaged(object sender, IrcMessageEventArgs e)
+            if (e.To.IsChannel)
+            {
+                if ((this.Target != null) && (this.Target.Equals(e.To)))
+                    b_doNotice = true;
+            }
+            else
+            {
+                if ((IsDefault && this.IsChannel && (e.From != null) && _nickList.Contains(e.From.Name)) 
+                    || ((e.From != null) && (this.Target != null) && this.Target.Equals(e.From))) // in case of private window is open, direct the notice there too
+                    b_doNotice = true;
+            }
+
+            if (b_doNotice)
+            {
+                if ((e.From == null) && (this.IsServer))
+                    this.Write("Notice", e.Message.Time, e.Text);
+                else
+                    this.Write("Notice", e.Message.Time, e.From.Prefix, e.Text, false, e.To); 
+            }
+            App.DoEvent("notice");
+		}
+
+		private void Session_PrivateMessaged(object sender, IrcMessageEventArgs e)
         {
-            if (App.IsIgnoreMatch(e.From, e.To.IsChannel ? IgnoreActions.Channel : IgnoreActions.Private))
+            if (App.IsIgnoreMatch(e.From.Prefix, e.To.IsChannel ? IgnoreActions.Channel : IgnoreActions.Private))
             {
                 return;
             }
@@ -88,7 +105,7 @@ namespace Floe.UI
             if (!this.IsServer)
             {
                 if ((this.Target.IsChannel && this.Target.Equals(e.To)) ||
-                    (!this.Target.IsChannel && this.Target.Equals(new IrcTarget(e.From)) && !e.To.IsChannel))
+                    (!this.Target.IsChannel && this.Target.Equals(e.From) && !e.To.IsChannel))
                 {
                     bool attn = false;
                     if (App.IsAttentionMatch(this.Session.Nickname, e.Text))
@@ -126,7 +143,7 @@ namespace Floe.UI
                         window.setOverlayIcon(OverlayIconState.ChatActivity);
                     }
 
-                    if (e.From.Prefix.Equals("*buffextras!buffextras@znc.in"))
+                    if (e.From != null && e.From.Prefix.Equals("*buffextras!buffextras@znc.in"))
                     {
                         int space = e.Text.IndexOf(' ');
                         String subject = e.Text.Substring(0, space);
@@ -164,17 +181,18 @@ namespace Floe.UI
                         {
                             styleKey = "Topic";
                         }
-                        this.Write(styleKey, e.Message.Time, string.Format("{0} {1}", peer.Nickname, text));
+                        this.Write(styleKey, e.Message.Time, string.Format("{0} {1}", subject, text));
+                        //this.Write(styleKey, e.Message.Time, e.From.Prefix, e.Text, attn);
                     }
                     else
                     {
-                        this.Write("Default", e.Message.Time, e.From, e.Text, attn);
+                        this.Write("Default", e.Message.Time, e.From.Prefix, e.Text, attn);
 
                         if (!this.Target.IsChannel)
                         {
-                            if (e.From.Prefix != _prefix)
+                            if (e.Message.From.Prefix != _prefix)
                             {
-                                _prefix = e.From.Prefix;
+                                _prefix = e.Message.From.Prefix;
                                 this.SetTitle();
                             }
                             Interop.WindowHelper.FlashWindow(_window);
@@ -199,7 +217,7 @@ namespace Floe.UI
             {
                 this.Write("Kick", e.Message.Time,
                     e.Kicker == null ? string.Format("{0} has been kicked ({1}", e.KickeeNickname, e.Text) :
-                    string.Format("{0} has been kicked by {1} ({2})", e.KickeeNickname, e.Kicker.Nickname, e.Text));
+                    string.Format("{0} has been kicked by {1} ({2})", e.KickeeNickname, e.Kicker.Name, e.Text));
                 _nickList.Remove(e.KickeeNickname);
             }
         }
@@ -209,7 +227,7 @@ namespace Floe.UI
             if (this.IsServer)
             {
                 this.Write("Kick", e.Message.Time, string.Format("You have been kicked from {0} by {1} ({2})",
-                    e.Channel, e.Kicker.Nickname, e.Text));
+                    e.Channel, e.Kicker.Name, e.Text));
             }
         }
 
@@ -217,6 +235,13 @@ namespace Floe.UI
         {
             switch (e.Code)
             {
+				case IrcCode.ERR_ERROR:
+					if (this.IsServer)
+					{
+						this.Write("Error", e.Text);
+						e.Handled = true;
+					}
+					break;
                 case IrcCode.ERR_NICKNAMEINUSE:
                     if (this.IsServer && this.Session.State == IrcSessionState.Connecting)
                     {
@@ -245,7 +270,7 @@ namespace Floe.UI
                         this.Target.Equals(new IrcTarget(e.Message.Parameters[1])))
                     {
                         this.Write("Topic", e.Message.Time, string.Format("Topic set by {0} on {1}", e.Message.Parameters[2],
-                            this.FormatTime(e.Message.Parameters[3])));
+                            FormatTime(e.Message.Parameters[3])));
                     }
                     return;
                 case IrcCode.RPL_CHANNELCREATEDON:
@@ -259,7 +284,7 @@ namespace Floe.UI
                 case IrcCode.RPL_WHOWASUSER:
                     if (e.Message.Parameters.Count == 6 && this.IsDefault)
                     {
-                        this.Write("ServerInfo", e.Message.Time,
+						this.Write("ServerInfo", e.Message.Time,
                             string.Format("{1} " + (e.Code == IrcCode.RPL_WHOWASUSER ? "was" : "is") + " {2}@{3} {4} {5}",
                             (object[])e.Message.Parameters));
                         return;
@@ -268,7 +293,7 @@ namespace Floe.UI
                 case IrcCode.RPL_WHOISCHANNELS:
                     if (e.Message.Parameters.Count == 3 && this.IsDefault)
                     {
-                        this.Write("ServerInfo", e.Message.Time, string.Format("{1} is on {2}",
+						this.Write("ServerInfo", e.Message.Time, string.Format("{1} is on {2}",
                             (object[])e.Message.Parameters));
                         return;
                     }
@@ -276,7 +301,7 @@ namespace Floe.UI
                 case IrcCode.RPL_WHOISSERVER:
                     if (e.Message.Parameters.Count == 4 && this.IsDefault)
                     {
-                        this.Write("ServerInfo", e.Message.Time, string.Format("{1} using {2} {3}",
+						this.Write("ServerInfo", e.Message.Time, string.Format("{1} using {2} {3}",
                             (object[])e.Message.Parameters));
                         return;
                     }
@@ -284,9 +309,9 @@ namespace Floe.UI
                 case IrcCode.RPL_WHOISIDLE:
                     if (e.Message.Parameters.Count == 5 && this.IsDefault)
                     {
-                        this.Write("ServerInfo", e.Message.Time, string.Format("{0} has been idle {1}, signed on {2}",
-                            e.Message.Parameters[1], this.FormatTimeSpan(e.Message.Parameters[2]),
-                            this.FormatTime(e.Message.Parameters[3])));
+						this.Write("ServerInfo", e.Message.Time, string.Format("{0} has been idle {1}, signed on {2}",
+                            e.Message.Parameters[1], FormatTimeSpan(e.Message.Parameters[2]),
+							FormatTime(e.Message.Parameters[3])));
                         return;
                     }
                     break;
@@ -298,6 +323,14 @@ namespace Floe.UI
                         return;
                     }
                     break;
+				case IrcCode.RPL_ENDOFWHOIS:
+					if (e.Message.Parameters.Count == 3 && this.IsDefault)
+					{
+						this.Write("ServerInfo", e.Message.Time, string.Format("{0} {1}",
+							e.Message.Parameters[1], e.Message.Parameters[2]));
+						return;
+					}
+					break;
                 case IrcCode.RPL_LIST:
                 case IrcCode.RPL_LISTSTART:
                 case IrcCode.RPL_LISTEND:
@@ -342,13 +375,13 @@ namespace Floe.UI
 
         private void Session_CtcpCommandReceived(object sender, CtcpEventArgs e)
         {
-            if (App.IsIgnoreMatch(e.From, IgnoreActions.Ctcp))
+            if (App.IsIgnoreMatch(e.From.Prefix, IgnoreActions.Ctcp))
             {
                 return;
             }
 
             if (((this.IsChannel && this.Target.Equals(e.To)) ||
-                (this.IsNickname && this.Target.Equals(new IrcTarget(e.From)) && !e.To.IsChannel))
+                (this.IsNickname && this.Target.Equals(e.From) && !e.To.IsChannel))
                 && e.Command.Command == "ACTION")
             {
                 string text = string.Join(" ", e.Command.Arguments);
@@ -359,15 +392,29 @@ namespace Floe.UI
                     if (_window != null)
                     {
                         Interop.WindowHelper.FlashWindow(_window);
+                        App.Alert(_window, string.Format("You received an alert from {0}", this.Target.Name));
                     }
-                }
+                    if (this.VisualParent == null)
+                    {
+                        this.NotifyState = NotifyState.Alert;
+                        App.DoEvent("inactiveAlert");
+                    }
+                    else if (_window != null && !_window.IsActive)
+                    {
+                        App.DoEvent("inactiveAlert");
+                    }
+                    else
+                    {
+                        App.DoEvent("activeAlert");
+                    }
 
-                this.Write("Action", e.Message.Time, string.Format("{0} {1}", e.From.Nickname, text, attn));
+                }
+                this.Write("Action", e.Message.Time, string.Format("{0} {1}", e.From.Name, text), attn);
             }
             else if (this.IsServer && e.Command.Command != "ACTION" && e.From != null)
             {
-                this.Write("Ctcp", e.Message.Time, e.From, string.Format("[CTCP {1}] {2}",
-                    e.From.Nickname, e.Command.Command,
+                this.Write("Ctcp", e.Message.Time, e.From.Prefix, string.Format("[CTCP {1}] {2}",
+                    e.From.Name, e.Command.Command,
                     e.Command.Arguments.Length > 0 ? string.Join(" ", e.Command.Arguments) : ""), false);
             }
         }
@@ -395,9 +442,17 @@ namespace Floe.UI
             {
                 if (!isIgnored)
                 {
-                    this.Write("Part", e.Message.Time, string.Format("{0} ({1}@{2}) has left channel {3}",
-                        e.Who.Nickname, e.Who.Username, e.Who.Hostname, this.Target.ToString()));
-                }
+					if (string.IsNullOrEmpty(e.Text))
+					{
+						this.Write("Part", e.Message.Time, string.Format("{0} ({1}@{2}) has left channel {3}",
+							e.Who.Nickname, e.Who.Username, e.Who.Hostname, this.Target.ToString()));
+					}
+					else
+					{
+						this.Write("Part", e.Message.Time, string.Format("{0} ({1}@{2}) has left channel {3} ({4})",
+							e.Who.Nickname, e.Who.Username, e.Who.Hostname, this.Target.ToString(), e.Text));
+					}
+				}
                 _nickList.Remove(e.Who.Nickname);
             }
         }
@@ -434,7 +489,7 @@ namespace Floe.UI
         {
             if (!this.IsServer && this.Target.Equals(e.Channel))
             {
-                this.Write("Topic", e.Message.Time, string.Format("{0} changed topic to: {1}", e.Who.Nickname, e.Text));
+                this.Write("Topic", e.Message.Time, string.Format("{0} changed topic to: {1}", e.Who.Name, e.Text));
                 _topic = e.Text;
                 this.SetTitle();
             }
@@ -457,7 +512,8 @@ namespace Floe.UI
             {
                 if (!isIgnored)
                 {
-                    this.Write("Quit", e.Message.Time, string.Format("{0} has quit ({1})", e.Who.Nickname, e.Text));
+                    this.Write("Quit", e.Message.Time, string.Format("{0} ({1}@{2}) has quit ({3})",
+                        e.Who.Nickname, e.Who.Username, e.Who.Hostname, e.Text));
                 }
                 _nickList.Remove(e.Who.Nickname);
             }
@@ -469,19 +525,9 @@ namespace Floe.UI
             {
                 if (e.Who != null)
                 {
-                    this.Write("Mode", e.Message.Time, string.Format("{0} set mode: {1}", e.Who.Nickname,
-                        string.Join(" ", IrcChannelMode.RenderModes(e.Modes))));
-
-                    _channelModes = (from m in e.Modes.Where((newMode) => newMode.Parameter == null && newMode.Set).
-                                         Select((newMode) => newMode.Mode).Union(_channelModes).Distinct()
-                                     where !e.Modes.Any((newMode) => !newMode.Set && newMode.Mode == m)
-                                     select m).ToArray();
-                }
-                else
-                {
-                    _channelModes = (from m in e.Modes
-                                     where m.Set && m.Parameter == null
-                                     select m.Mode).ToArray();
+					this.Write("Mode", e.Message.Time, string.Format("{0} sets mode: {1}", e.Who.Name,
+						string.Join(" ", IrcChannelMode.RenderModes(e.Modes))));
+					_channelModes = AssembleChannelModes(e).ToCharArray();
                 }
                 this.SetTitle();
                 foreach (var mode in e.Modes)
@@ -493,14 +539,15 @@ namespace Floe.UI
 
         private void Session_Invited(object sender, IrcInviteEventArgs e)
         {
-            if (App.IsIgnoreMatch(e.From, IgnoreActions.Invite))
+            if (App.IsIgnoreMatch(e.From.Prefix, IgnoreActions.Invite))
             {
                 return;
             }
 
             if (this.IsDefault || this.IsServer)
             {
-                this.Write("Invite", e.Message.Time, string.Format("{0} invited you to channel {1}", e.From.Nickname, e.Channel));
+                this.Write("Invite", e.Message.Time, string.Format("{0} invited you to channel {1}", e.From.Name, e.Channel));
+				InvitesList.Add(new InviteItem(e.Channel, e.From.Name, DateTime.Now));
             }
         }
 
@@ -878,7 +925,8 @@ namespace Floe.UI
                         {
                             tabHit = true;
                             DoNickCompletion();
-                        }
+							DoChannelCompletion();
+						}
                         break;
                     default:
                         Keyboard.Focus(txtInput);
@@ -889,7 +937,8 @@ namespace Floe.UI
                 if (tabHit != true)
                 {
                     _nicknameComplete = null;
-                }
+					_channameComplete = null;
+				}
             }
             else if (e.Key >= Key.A && e.Key <= Key.Z)
             {
@@ -936,6 +985,8 @@ namespace Floe.UI
             DataObject.AddPastingHandler(txtInput, new DataObjectPastingEventHandler(txtInput_Pasting));
 
             this.IsConnected = !(this.Session.State == IrcSessionState.Disconnected);
+            if (_nickList != null)
+                _nickList.NickListChanged += OnNickListChanged;
         }
 
         private void UnsubscribeEvents()
@@ -963,6 +1014,9 @@ namespace Floe.UI
             {
                 _window.Deactivated -= new EventHandler(_window_Deactivated);
             }
+
+            if (_nickList != null)
+                _nickList.NickListChanged -= OnNickListChanged;
         }
 
         private void PrepareContextMenus()
@@ -992,9 +1046,14 @@ namespace Floe.UI
             {
                 NameScope.SetNameScope(menu, NameScope.GetNameScope(this));
             }
-        }
+			menu = this.Resources["cmUser"] as ContextMenu;
+			if (menu != null)
+			{
+				NameScope.SetNameScope(menu, NameScope.GetNameScope(this));
+			}
+		}
 
-        private string FormatTime(string text)
+		public static string FormatTime(string text)
         {
             int seconds = 0;
             if (!int.TryParse(text, out seconds))
@@ -1005,7 +1064,7 @@ namespace Floe.UI
             return new DateTime(1970, 1, 1).Add(ts).ToLocalTime().ToString();
         }
 
-        private string FormatTimeSpan(string text)
+        public static string FormatTimeSpan(string text)
         {
             int seconds = 0;
             if (!int.TryParse(text, out seconds))
@@ -1013,6 +1072,120 @@ namespace Floe.UI
                 return "";
             }
             return new TimeSpan(0, 0, seconds).ToString();
+        }
+
+        public void OnNickListChanged(object source, EventArgs e)
+        {
+            this.SetTitle();
+        }
+
+        public string OrderChannelModes(string chanModes)
+        {
+            string resultModes = String.Empty;
+            if (chanModes.Contains('s'))
+                resultModes += 's';
+            if (chanModes.Contains('p'))
+                resultModes += 'p';
+            if (chanModes.Contains('m'))
+                resultModes += 'm';
+            if (chanModes.Contains('t'))
+                resultModes += 't';
+            if (chanModes.Contains('i'))
+                resultModes += 'i';
+            if (chanModes.Contains('n'))
+                resultModes += 'n';
+            if (chanModes.Contains('r'))
+                resultModes += 'r';
+            if (chanModes.Contains('D'))
+                resultModes += 'D';
+            if (chanModes.Contains('d'))
+                resultModes += 'd';
+            if (chanModes.Contains('R'))
+                resultModes += 'R';
+            if (chanModes.Contains('l'))
+                resultModes += 'l';
+            if (chanModes.Contains('k'))
+                resultModes += 'k';
+            if (string.IsNullOrWhiteSpace(resultModes) || string.IsNullOrEmpty(resultModes))
+                resultModes = chanModes;
+            return resultModes;
+        }
+
+        public string AssembleChannelModes(IrcChannelModeEventArgs chModes)
+        {
+            List<string> StrChanModes = new List<string>(new string(_channelModes).Split(' ').ToList());
+            string _chanModes = StrChanModes[0];
+            List<string> modeParam = new List<string>();
+            if (StrChanModes.Count > 1)
+                modeParam = StrChanModes.Skip(1).ToList();
+            StringBuilder sb = new StringBuilder();
+            sb.Append(_chanModes);
+            foreach (IrcChannelMode mode in chModes.Modes)
+            {
+                switch (mode.Mode)
+                {
+                    case 'O':
+                    case 'o':
+                    case 'v':
+                    case 'h':
+                    //case 'k':
+                    //case 'l':
+                    case 'b':
+                    case 'e':
+                    case 'I':
+                    case 'f':
+                    case 'j':
+                    case 'q':
+                        continue;
+                }
+                if (!_chanModes.Contains(mode.Mode) && mode.Set)
+                {
+                    sb.Append(mode.Mode);
+                    if (!string.IsNullOrWhiteSpace(mode.Parameter))
+                    {
+                        if (mode.Mode == 'l')
+                            modeParam.Insert(0, mode.Parameter);
+                        else
+                            modeParam.Add(mode.Parameter);
+                    }
+                }
+                else if (_chanModes.Contains(mode.Mode))
+                {
+					if (!mode.Set)
+					{
+						sb.Remove(sb.ToString().IndexOf(mode.Mode), 1);
+						if (modeParam.Count > 0)
+						{
+							if (mode.Mode == 'l')
+								modeParam.RemoveAt(0);
+							if (mode.Mode == 'k')
+							{
+								if (modeParam.Count > 1)
+									modeParam.RemoveAt(1);
+								else
+									modeParam.RemoveAt(0);
+							}
+						}
+					}
+					else
+					{
+						if (mode.Mode == 'l')
+							modeParam[0] = mode.Parameter;
+						if (mode.Mode == 'k')
+						{
+							if (modeParam.Count > 1)
+								modeParam[1] = mode.Parameter;
+							else
+								modeParam[0] = mode.Parameter;
+						}
+					}
+				}
+            }
+            sb = new StringBuilder(OrderChannelModes(sb.ToString()));
+            if (modeParam.Count > 0)
+                sb.Append(" ").Append(string.Join<string>(" ", modeParam));
+            _chanModes = sb.ToString();
+            return _chanModes;
         }
     }
 }

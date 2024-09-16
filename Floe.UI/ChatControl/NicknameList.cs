@@ -5,13 +5,13 @@ using System.Collections.Specialized;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
 using Floe.Net;
 
 namespace Floe.UI
 {
 	public class NicknameList : KeyedCollection<string, NicknameItem>, INotifyCollectionChanged
 	{
+		public EventHandler NickListChanged;
 		public NicknameList()
 			: base(StringComparer.OrdinalIgnoreCase)
 		{
@@ -26,11 +26,13 @@ namespace Floe.UI
 			{
 				this.Add(item);
 			}
+			OnNickListChanged(this, null);
 		}
 
 		public void Add(string nick)
 		{
 			this.Add(new NicknameItem(nick));
+			OnNickListChanged(this, null);
 		}
 
 		public void ChangeNick(string oldNick, string newNick)
@@ -117,7 +119,14 @@ namespace Floe.UI
 			if (handler != null)
 			{
 				handler(this, args);
+				OnNickListChanged(this, null);
 			}
+		}
+
+		protected virtual void OnNickListChanged(object source, EventArgs e)
+		{
+			if (NickListChanged != null)
+				NickListChanged(this, null);
 		}
 	}
 }

@@ -37,3 +37,5 @@
 /WHO <mask>                             - Get info on one or more users
 /WHOIS [target] <nick>                  - Get extended info on a user
 /WHOWAS <nick>                          - See if/when a user was logged on
+/OPER <user> <password>                 - Oper-up yourself
+/HOP or /CY [#channel] [message]        - Part-join a channel with optional part message.

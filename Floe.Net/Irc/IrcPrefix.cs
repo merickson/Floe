@@ -26,7 +26,17 @@ namespace Floe.Net
 			return this.Prefix;
 		}
 
-		public static IrcPrefix Parse(string prefix)
+        public override bool Equals(object obj)
+        {
+            return this.Prefix.Equals(obj.ToString(), StringComparison.OrdinalIgnoreCase);
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+
+        public static IrcPrefix Parse(string prefix)
 		{
 			if (string.IsNullOrEmpty(prefix))
 			{

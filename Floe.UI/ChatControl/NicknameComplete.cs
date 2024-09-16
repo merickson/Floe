@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows.Controls;
+using Floe.Net;
 
 namespace Floe.UI
 {
@@ -20,17 +21,19 @@ namespace Floe.UI
             _tabCount = 0;
             _txtInput = txtInput;
             _incompleteNick = initialInputParse();
-            _nickCandidates = (from n in nickList
-                               where n.Nickname.StartsWith(_incompleteNick, StringComparison.InvariantCultureIgnoreCase)
-                               orderby n.Nickname.ToLowerInvariant()
-                               select n.Nickname).ToArray();
-
+			if (!IrcTarget.IsChannelName(_incompleteNick))
+			{
+				_nickCandidates = (from n in nickList
+								   where n.Nickname.StartsWith(_incompleteNick, StringComparison.InvariantCultureIgnoreCase)
+								   orderby n.Nickname.ToLowerInvariant()
+								   select n.Nickname).ToArray();
+			}
         }
 
         public void getNextNick()
         {
             _tabCount++;
-            if (_nickCandidates.Length <= 0)
+            if (_nickCandidates == null || _nickCandidates.Length <= 0)
             {
                 return;
             }
@@ -63,6 +66,10 @@ namespace Floe.UI
             while ( c != ' ' && i > 0)
             {
                 c = _txtInput.Text[--i];
+                if ((c == '=') && (_txtInput.Text[i - 1] == ' '))
+                {
+                    break;
+                }
             }
             if (i == 0)
             {

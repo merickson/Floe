@@ -189,4 +189,72 @@ namespace Floe.UI
 			return (Visibility)value == this.TrueValue;
 		}
 	}
+
+	[ValueConversion(typeof(bool), typeof(bool))]
+	public class InverseBooleanConverter : IValueConverter
+	{
+		#region IValueConverter Members
+
+		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+		{
+			if (targetType != typeof(bool))
+				throw new InvalidOperationException("The target must be a boolean");
+
+			return !(bool)value;
+		}
+
+		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+		{
+			throw new NotSupportedException();
+		}
+
+		#endregion
+	}
+
+	[ValueConversion(typeof(bool?), typeof(bool))]
+	public class InverseNulleableBooleanConverter : IValueConverter
+	{
+		#region IValueConverter Members
+
+		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+		{
+			if (targetType != typeof(bool?) && (targetType == typeof(bool)))
+			{
+				//throw new InvalidOperationException("The target must be a nullable boolean");
+				return !(bool)value;
+			}
+			bool? b = (bool?)value;
+			return b.HasValue && !b.Value;
+		}
+
+		public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+		{
+			return !(value as bool?);
+		}
+
+		#endregion
+	}
+
+	public class ProxySettingsConverter : IMultiValueConverter
+	{
+		public object Convert(
+			object[] values, Type targetType, object parameter, CultureInfo culture)
+		{
+			var globalProxyValue = (string)values[0];
+			var localProxyValue = String.Empty;
+			try
+			{
+				localProxyValue = (string)values[1];
+			}
+			catch { }
+			var showLocal = (bool)values[2];
+			return showLocal ? localProxyValue : globalProxyValue;
+		}
+
+		public object[] ConvertBack(
+			object value, Type[] targetTypes, object parameter, CultureInfo culture)
+		{
+			return new object[] { null, value };
+		}
+	}
 }

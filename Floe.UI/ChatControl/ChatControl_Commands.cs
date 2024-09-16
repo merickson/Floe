@@ -36,6 +36,8 @@ namespace Floe.UI
 		public readonly static RoutedUICommand JoinCommand = new RoutedUICommand("Join", "Join", typeof(ChatWindow));
 		public readonly static RoutedUICommand ChannelPanelCommand = new RoutedUICommand("Channel Pane", "ChannelPane", typeof(ChatControl));
 		public readonly static RoutedUICommand ListCommand = new RoutedUICommand("List", "List", typeof(ChatControl));
+		public readonly static RoutedUICommand ChannelInfoCommand = new RoutedUICommand("Channel info", "ChanInfo", typeof(ChatControl));
+		public readonly static RoutedUICommand UserInfoCommand = new RoutedUICommand("User info", "UserInfo", typeof(ChatControl));
 
 		private void CanExecuteConnectedCommand(object sender, CanExecuteRoutedEventArgs e)
 		{
@@ -99,7 +101,8 @@ namespace Floe.UI
 			var s = e.Parameter as string;
 			if (!string.IsNullOrEmpty(s))
 			{
-				this.Session.WhoIs(s);
+				//this.Session.WhoIs(s);
+				UserInfoCommand.Execute(new IrcTarget(s), this);
 			}
 		}
 
@@ -255,6 +258,36 @@ namespace Floe.UI
 			}
 		}
 
+		private void ExecuteChannelInfo(object sender, ExecutedRoutedEventArgs e)
+		{
+			if (Target == null)
+				return;
+			// This can happen when ChatControl.xaml KeyBinding InputGesture Alt+I is requested
+			if (this.IsNickname)
+			{
+				ExecuteUserInfo(sender, e);
+				return;
+			}
+			var infoWindow = new UI.InfoWindows.ChannelInfoWindow(this);
+			infoWindow.Owner = Application.Current.MainWindow;
+			infoWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+			infoWindow.ShowDialog();
+		}
+
+
+		private void ExecuteUserInfo(object sender, ExecutedRoutedEventArgs e)
+		{
+			if (Target == null)
+				return;
+			IrcTarget target = Target;
+			if (e.Parameter is IrcTarget)
+				target = e.Parameter as IrcTarget;
+			var infoWindow = new UI.InfoWindows.UserInfoWindow(Session, target);
+			infoWindow.Owner = Application.Current.MainWindow;
+			infoWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+			infoWindow.ShowDialog();
+		}
+
 		private void ExecuteSearch(object sender, ExecutedRoutedEventArgs e)
 		{
 			this.ToggleSearch();
@@ -357,10 +390,25 @@ namespace Floe.UI
 
 			switch (command)
 			{
+				case "DEBUG":
+					args = Split(command, arguments, 0, 1);
+					if (args.Length == 1)
+						App.Create(this.Session, new DebugControl.DebugControl(this.Session, args[0]), true);
+					else
+						App.ChatWindow.AddPage(new DebugControl.DebugControl(this.Session), true);
+					break;
                 case "QUOTE":
-                    args = Split(command, arguments, 1, 1);
-                    this.Session.Quote(args[0]);
-                    break;
+					args = Split(command, arguments, 1, 1);
+					this.Session.Quote(args[0]);
+					break;
+				case "OPER":
+					args = Split(command, arguments, 1, 2);
+					this.Session.Oper(args);
+					break;
+				case "KILL":
+					args = Split(command, arguments, 2, 2);
+					this.Session.Kill(new IrcTarget(args[0]), args[1]);
+					break;
 				case "QUIT":
 					args = Split(command, arguments, 0, 1);
 					this.Session.AutoReconnect = false;
@@ -369,10 +417,15 @@ namespace Floe.UI
 				case "NICK":
 					args = Split(command, arguments, 1, 1);
 					this.Session.Nick(args[0]);
-					break;
+                    this.SetTitle();
+                    if (this.IsServer && this.Session.State == IrcSessionState.Disconnected)
+                        this.Write("Own", string.Format("Your nick is now {0}", args[0]));
+                    break;
 				case "NOTICE":
+				case "N":
 					args = Split(command, arguments, 2, 2);
 					this.Session.Notice(new IrcTarget(args[0]), args[1]);
+					this.Write("Notice", string.Format("-> -{0}- {1}", args[0], args[1]));
 					break;
 				case "JOIN":
 				case "J":
@@ -387,9 +440,17 @@ namespace Floe.UI
 					}
 					break;
 				case "PART":
+				case "P":
 				case "LEAVE":
-					args = Split(command, arguments, 1, 1, true);
-					this.Session.Part(args[0]);
+					args = Split(command, arguments, 1, 2, true);
+					if (args.Length == 2)
+					{
+						this.Session.Part(args[0], args[1]);
+					}
+					else
+					{
+						this.Session.Part(args[0]);
+					}
 					break;
 				case "TOPIC":
 					args = Split(command, arguments, 1, 2, true);
@@ -402,9 +463,27 @@ namespace Floe.UI
 						this.Session.Topic(args[0]);
 					}
 					break;
+				case "HOP":
+				case "CYCLE":
+				case "CY":
+					args = Split(command, arguments, 1, 2, true);
+					if (args.Length == 2)
+						this.Session.Part(args[0], args[1]);
+					else
+						this.Session.Part(args[0]);
+					this.Session.Join(args[0]);
+					break;
 				case "INVITE":
-					args = Split(command, arguments, 2, 2);
-					this.Session.Invite(args[1], args[0]);
+					args = Split(command, arguments, 0, 2);
+					if (args.Length == 1)
+					{
+						args = Split(command, arguments, 2, 2);
+						break;
+					}
+					if (args.Length == 0)
+						this.Session.Invite();
+					else
+						this.Session.Invite(args[1], args[0]);
 					break;
 				case "KICK":
 					args = Split(command, arguments, 2, 3, true);
@@ -496,8 +575,9 @@ namespace Floe.UI
 					}
 					break;
 				case "SERVER":
-					{
-						args = Split(command, arguments, 1, 3);
+                case "S":
+                    {
+                        args = Split(command, arguments, 1, 3);
 						int port = 0;
 						bool useSsl = false;
 						if (args.Length > 1 && (args[1] = args[1].Trim()).Length > 0)
@@ -511,7 +591,7 @@ namespace Floe.UI
 						string password = null;
 						if (args.Length > 2)
 						{
-							password = args[2];
+							password = String.Join(" ", args.Skip(2).ToArray());
 						}
 						if (port == 0)
 						{
@@ -523,7 +603,7 @@ namespace Floe.UI
 							this.Session.Quit("Changing servers");
 						}
 						this.Perform = "";
-						this.Connect(null, args[0], port, useSsl, false, password);
+						this.Connect(null, args[0], port, useSsl, false, password, useGlobalProxySettings: true);
 					}
 					break;
 				case "ME":
@@ -535,7 +615,7 @@ namespace Floe.UI
 					if (this.IsConnected)
 					{
 						args = Split(command, arguments, 1, int.MaxValue);
-						this.Write("Own", string.Format("{0} {1}", this.Session.Nickname, string.Join(" ", args)));
+						this.Write("Action", string.Format("{0} {1}", this.Session.Nickname, string.Join(" ", args)));
 						if (this.Type == ChatPageType.Chat)
 						{
 							this.Session.SendCtcp(this.Target, new CtcpCommand("ACTION", args), false);
@@ -545,6 +625,10 @@ namespace Floe.UI
 							_dcc.QueueMessage(string.Format("\u0001ACTION {0}\u0001", string.Join(" ", args)));
 						}
 					}
+					break;
+				case "VERSION":
+					args = Split(command, arguments, 1, 1);
+					this.Session.SendCtcp(new IrcTarget(args[0]), new CtcpCommand("VERSION", new string[] { }), false);
 					break;
 				case "SETUP":
 					App.ShowSettings();
@@ -607,7 +691,8 @@ namespace Floe.UI
 						new CtcpCommand(args[1], args.Skip(2).ToArray()), false);
 					break;
 				case "QUERY":
-					args = Split(command, arguments, 1, 1);
+                case "Q":
+                    args = Split(command, arguments, 1, 1);
 					ChatWindow.ChatCommand.Execute(args[0], this);
 					break;
 				case "BAN":

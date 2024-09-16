@@ -68,7 +68,7 @@ namespace Floe.UI
 
 		private void Session_CtcpCommandReceived(object sender, CtcpEventArgs e)
 		{
-			if (App.IsIgnoreMatch(e.From, IgnoreActions.Ctcp))
+			if (App.IsIgnoreMatch(e.From.Prefix, IgnoreActions.Ctcp))
 			{
 				return;
 			}
@@ -80,30 +80,30 @@ namespace Floe.UI
 				switch (e.Command.Command)
 				{
 					case "VERSION":
-						session.SendCtcp(new IrcTarget(e.From), new CtcpCommand(
+						session.SendCtcp(e.From, new CtcpCommand(
 							"VERSION",
 							App.Product,
 							App.Version), true);
 						break;
 					case "PING":
-						session.SendCtcp(new IrcTarget(e.From), new CtcpCommand(
+						session.SendCtcp(e.From, new CtcpCommand(
 							"PONG",
 							e.Command.Arguments.Length > 0 ? e.Command.Arguments[0] : null), true);
 						break;
 					case "CLIENTINFO":
-						session.SendCtcp(new IrcTarget(e.From), new CtcpCommand(
+						session.SendCtcp(e.From, new CtcpCommand(
 							"CLIENTINFO",
 							"VERSION", "PING", "CLIENTINFO", "ACTION"), true);
 						break;
 					case "DCC":
 						var args = e.Command.Arguments;
-						e.Handled = this.HandleDcc(session, new IrcTarget(e.From), args);
+						e.Handled = this.HandleDcc(session, e.From, args);
 						break;
 				}
 			}
 		}
 
-		private void session_RawMessageReceived(object sender, IrcEventArgs e)
+		private void Session_RawMessageReceived(object sender, IrcEventArgs e)
 		{
 			if (e.Message.Command == "PRIVMSG" && e.Message.Parameters.Count == 2
 				&& (!CtcpCommand.IsCtcpCommand(e.Message.Parameters[1]) ||
@@ -114,25 +114,25 @@ namespace Floe.UI
 				{
 					return;
 				}
-				if (!target.IsChannel && e.Message.From is IrcPeer)
+				if (!target.IsChannel/* && e.Message.From is IrcPeer*/)
 				{
-					if (App.Create(sender as IrcSession, new IrcTarget((IrcPeer)e.Message.From), false)
+					if (App.Create(sender as IrcSession, new IrcTarget(e.Message.From), false)
 						&& _notifyIcon != null && _notifyIcon.IsVisible)
 					{
 						_notifyIcon.Show("IRC Message", string.Format("You received a message from {0}.", ((IrcPeer)e.Message.From).Nickname));
 					}
 				}
-                else if (_notifyIcon != null && _notifyIcon.IsVisible && e.Message.From is IrcPeer)
-                {
-                    var title = String.Format("{0} : {1}", e.Message.Parameters[0], ((IrcPeer)e.Message.From).Nickname);
-                    _notifyIcon.Show(title, e.Message.Parameters[1]);
-                }
+				else if (_notifyIcon != null && _notifyIcon.IsVisible && e.Message.From is IrcPeer)
+				{
+					var title = String.Format("{0} : {1}", e.Message.Parameters[0], ((IrcPeer)e.Message.From).Nickname);
+					_notifyIcon.Show(title, e.Message.Parameters[1]);
+				}
 			}
 		}
 
 		private void ChatWindow_Loaded(object sender, RoutedEventArgs e)
 		{
-			this.AddPage(new ChatControl(ChatPageType.Server, new IrcSession(), null), true);
+			this.AddPage(new ChatControl(ChatPageType.Server, new IrcSession(App.Settings.Current.User.Nickname), null), true);
 
 			if (Application.Current.MainWindow == this)
 			{
@@ -148,7 +148,7 @@ namespace Floe.UI
 				{
 					if (i++ > 0)
 					{
-						this.AddPage(new ChatControl(ChatPageType.Server, new IrcSession(), null), false);
+						this.AddPage(new ChatControl(ChatPageType.Server, new IrcSession(App.Settings.Current.User.Nickname), null), false);
 					}
 					var page = this.Items[this.Items.Count - 1] as ChatTabItem;
 					if (page != null)
@@ -203,7 +203,7 @@ namespace Floe.UI
 			}
 		}
 
-		private void session_InfoReceived(object sender, IrcInfoEventArgs e)
+		private void Session_InfoReceived(object sender, IrcInfoEventArgs e)
 		{
 			var session = sender as IrcSession;
 			switch (e.Code)
@@ -236,8 +236,8 @@ namespace Floe.UI
 			session.SelfKicked += new EventHandler<IrcKickEventArgs>(Session_SelfKicked);
 			session.StateChanged += new EventHandler<EventArgs>(Session_StateChanged);
 			session.CtcpCommandReceived += new EventHandler<CtcpEventArgs>(Session_CtcpCommandReceived);
-			session.RawMessageReceived += new EventHandler<IrcEventArgs>(session_RawMessageReceived);
-			session.InfoReceived += new EventHandler<IrcInfoEventArgs>(session_InfoReceived);
+			session.RawMessageReceived += new EventHandler<IrcEventArgs>(Session_RawMessageReceived);
+			session.InfoReceived += new EventHandler<IrcInfoEventArgs>(Session_InfoReceived);
 		}
 
 		public void UnsubscribeEvents(IrcSession session)
@@ -247,8 +247,8 @@ namespace Floe.UI
 			session.SelfKicked -= new EventHandler<IrcKickEventArgs>(Session_SelfKicked);
 			session.StateChanged -= new EventHandler<EventArgs>(Session_StateChanged);
 			session.CtcpCommandReceived -= new EventHandler<CtcpEventArgs>(Session_CtcpCommandReceived);
-			session.RawMessageReceived -= new EventHandler<IrcEventArgs>(session_RawMessageReceived);
-			session.InfoReceived -= new EventHandler<IrcInfoEventArgs>(session_InfoReceived);
+			session.RawMessageReceived -= new EventHandler<IrcEventArgs>(Session_RawMessageReceived);
+			session.InfoReceived -= new EventHandler<IrcInfoEventArgs>(Session_InfoReceived);
 		}
 	}
 }

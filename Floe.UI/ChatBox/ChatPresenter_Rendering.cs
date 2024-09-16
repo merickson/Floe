@@ -62,13 +62,17 @@ namespace Floe.UI
 			}
 		}
 
-		private string FormatNick(string nick)
+		private string FormatNick(string nick, bool notice = false)
 		{
 			if (!this.UseTabularView)
 			{
 				if (nick == null)
 				{
 					nick = "* ";
+				}
+				else if (notice)
+				{
+					nick = string.Format("-{0}- ", nick);
 				}
 				else
 				{
@@ -101,7 +105,7 @@ namespace Floe.UI
 				var b = new Block();
 				b.Source = line;
 				b.TimeString = this.FormatTime(b.Source.Time);
-				b.NickString = this.FormatNick(b.Source.Nick);
+				b.NickString = this.FormatNick(b.Source.Nick, b.Source.ColorKey == "Notice" ? true : false);
 
 				var offset = _blocks.Last != null ? _blocks.Last.Value.CharEnd : 0;
 				b.CharStart = offset;
@@ -119,7 +123,7 @@ namespace Floe.UI
 			b.Source = line;
 
 			b.TimeString = this.FormatTime(b.Source.Time);
-			b.NickString = this.FormatNick(b.Source.Nick);
+			b.NickString = this.FormatNick(b.Source.Nick, b.Source.ColorKey == "Notice" ? true : false);
 
 			var offset = _blocks.Last != null ? _blocks.Last.Value.CharEnd : 0;
 			b.CharStart = offset;
@@ -198,7 +202,7 @@ namespace Floe.UI
 				{
 					b.CharStart = offset;
 					b.TimeString = this.FormatTime(b.Source.Time);
-					b.NickString = this.FormatNick(b.Source.Nick);
+					b.NickString = this.FormatNick(b.Source.Nick, b.Source.ColorKey == "Notice" ? true : false);
 					offset += b.TimeString.Length + b.NickString.Length + b.Source.Text.Length;
 					b.CharEnd = offset;
 				}
@@ -304,15 +308,15 @@ namespace Floe.UI
 						var markerBrush = new LinearGradientBrush(this.NewMarkerColor,
 							this.NewMarkerTransparentColor, 90.0);
 						dc.DrawRectangle(markerBrush, null,
-							new Rect(new Point(0.0, block.Y), new Size(this.ViewportWidth, _lineHeight * 5)));
+							new Rect(new Point(0.0, block.Y), new Size(this.ViewportWidth, _lineHeight * 0.5)));
 					}
 					if ((block.Source.Marker & ChatMarker.OldMarker) > 0)
 					{
 						var markerBrush = new LinearGradientBrush(this.OldMarkerTransparentColor,
 							this.OldMarkerColor, 90.0);
 						dc.DrawRectangle(markerBrush, null,
-							new Rect(new Point(0.0, (block.Y + block.Height) - _lineHeight * 5),
-								new Size(this.ViewportWidth, _lineHeight * 5)));
+							new Rect(new Point(0.0, (block.Y + block.Height) - _lineHeight * 0.5),
+								new Size(this.ViewportWidth, _lineHeight * 0.5)));
 					}
 
 					if (_bottomBlock == null)
@@ -322,7 +326,7 @@ namespace Floe.UI
 					guidelines.GuidelinesY.Add(vPos + guidelineHeight);
 				}
 			}
-			while (node.Previous != null && vPos >= -_lineHeight * 5.0 && (node = node.Previous) != null);
+			while (node.Previous != null && vPos >= -_lineHeight * 0.5 && (node = node.Previous) != null);
 
 			dc.PushGuidelineSet(guidelines);
 

@@ -1,0 +1,127 @@
+﻿<Window x:Class="Floe.UI.InfoWindows.ChannelInfoWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Floe.UI.InfoWindows"
+        xmlns:global="clr-namespace:Floe.UI"
+        mc:Ignorable="d"
+        x:Name="chInfoWindow" Title="ChannelInfoWindow" Width="640" Height="480">
+    <Window.Resources>
+        <Style x:Key="CenterGridHeaderStyle" TargetType="DataGridColumnHeader">
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        </Style>
+        <Style x:Key="CenterCellStyle" TargetType="DataGridCell">
+            <Setter Property="TextBlock.TextAlignment" Value="Center"/>
+            <Setter Property="TextBox.TextAlignment" Value="Center"/>
+        </Style>
+        <ContextMenu x:Key="cmBans">
+            <!--https://stackoverflow.com/questions/455551/why-is-this-wpf-routedcommand-bound-context-menuitem-disabled-->
+            <MenuItem Header="Add" Command="local:ChannelInfoWindow.AddBanMaskCommand" CommandTarget="{Binding Path=PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+            <MenuItem Header="Edit" Command="local:ChannelInfoWindow.EditBanMaskCommand"/>
+            <MenuItem Header="Remove" Command="local:ChannelInfoWindow.RemoveBanMaskCommand"/>
+        </ContextMenu>
+        <DataTemplate x:Key="BansAndExceptionsTemplate">
+            <DataGrid ItemsSource="{Binding}" AutoGenerateColumns="False" CanUserAddRows="True" CanUserDeleteRows="True" 
+                      ColumnWidth="*"
+                      ColumnHeaderStyle="{StaticResource CenterGridHeaderStyle}" 
+                      CellStyle="{StaticResource CenterCellStyle}" 
+                      ContextMenu="{StaticResource cmBans}" 
+                      SelectedIndex="{Binding SelectedMaskIndex}"
+                      SelectionChanged="DataGrid_SelectionChanged"
+                      BeginningEdit="DataGrid_BeginningEdit"
+                      CellEditEnding="DataGrid_CellEditEnding"
+                      VerticalScrollBarVisibility="Auto"
+                      SnapsToDevicePixels="True" LoadingRow="DataGrid_LoadingRow">
+                <DataGrid.InputBindings>
+                    <MouseBinding Gesture="LeftDoubleClick" Command="local:ChannelInfoWindow.EditBanMaskCommand"/>
+                </DataGrid.InputBindings>
+                <DataGrid.CommandBindings>
+                    <CommandBinding Command="local:ChannelInfoWindow.AddBanMaskCommand" Executed="ExecuteAddBanMask" CanExecute="CanModifyBans"/>
+                    <CommandBinding Command="local:ChannelInfoWindow.EditBanMaskCommand" Executed="ExecuteEditBanMask" CanExecute="CanModifyBans"/>
+                    <CommandBinding Command="local:ChannelInfoWindow.RemoveBanMaskCommand" Executed="ExecuteRemoveBanMask" CanExecute="CanModifyBans"/>
+                </DataGrid.CommandBindings>
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Mask" Binding="{Binding Mask}"/>
+                    <DataGridTextColumn Header="Set By" Binding="{Binding SetBy}" IsReadOnly="True"/>
+                    <DataGridTextColumn Header="Timestamp" Binding="{Binding Timestamp, StringFormat='yyyy.MM.dd HH:mm'}" IsReadOnly="True"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </DataTemplate>
+    </Window.Resources>
+    <Window.CommandBindings>
+        <CommandBinding Command="local:ChannelInfoWindow.Mode_s_Command" Executed="Mode_s_Executed" CanExecute="CanExecuteIsOp"/>
+        <CommandBinding Command="local:ChannelInfoWindow.Mode_p_Command" Executed="Mode_p_Executed" CanExecute="CanExecuteIsOp"/>
+        <CommandBinding Command="local:ChannelInfoWindow.Mode_m_Command" Executed="Mode_m_Executed" CanExecute="CanExecuteIsOp"/>
+        <CommandBinding Command="local:ChannelInfoWindow.Mode_t_Command" Executed="Mode_t_Executed" CanExecute="CanExecuteIsOp"/>
+        <CommandBinding Command="local:ChannelInfoWindow.Mode_i_Command" Executed="Mode_i_Executed" CanExecute="CanExecuteIsOp"/>
+        <CommandBinding Command="local:ChannelInfoWindow.Mode_n_Command" Executed="Mode_n_Executed" CanExecute="CanExecuteIsOp"/>
+        <CommandBinding Command="local:ChannelInfoWindow.Mode_r_Command" Executed="Mode_r_Executed" CanExecute="CanExecuteIsOp"/>
+        <CommandBinding Command="local:ChannelInfoWindow.Mode_D_Command" Executed="Mode_D_Executed" CanExecute="CanExecuteIsOp"/>
+        <CommandBinding Command="local:ChannelInfoWindow.Mode_d_Command" Executed="Mode_d_Executed" CanExecute="CanExecuteIsOp"/>
+        <CommandBinding Command="local:ChannelInfoWindow.Mode_R_Command" Executed="Mode_R_Executed" CanExecute="Mode_R_CanExecute"/>
+        <CommandBinding Command="local:ChannelInfoWindow.Mode_l_Command" Executed="Mode_l_Executed" CanExecute="Mode_l_CanExecute"/>
+        <CommandBinding Command="local:ChannelInfoWindow.Mode_k_Command" Executed="Mode_k_Executed" CanExecute="Mode_k_CanExecute"/>
+    </Window.CommandBindings>
+    <Grid>
+        <DockPanel LastChildFill="True">
+            <TextBox x:Name="TopicTxtBx" Text="{Binding Path=TopicStr, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" DockPanel.Dock="Top" KeyUp="TxtBx_KeyUp"/>
+            <DockPanel DockPanel.Dock="Top" HorizontalAlignment="Stretch">
+                <DockPanel.Resources>
+                    <Style TargetType="ToggleButton">
+                        <Setter Property="MinWidth" Value="20"/>
+                        <Setter Property="MinHeight" Value="20"/>
+                        <!--<Style.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter Property="Background" Value="DarkCyan"/>
+                            </Trigger>
+                        </Style.Triggers>-->
+                    </Style>
+                </DockPanel.Resources>
+                <ToggleButton Content="s" IsChecked="{Binding Mode_s_Toggled}" Command="local:ChannelInfoWindow.Mode_s_Command" ToolTip="Secret channel" />
+                <ToggleButton Content="p" IsChecked="{Binding Mode_p_Toggled}" Command="local:ChannelInfoWindow.Mode_p_Command" ToolTip="Private channel" />
+                <ToggleButton Content="m" IsChecked="{Binding Mode_m_Toggled}" Command="local:ChannelInfoWindow.Mode_m_Command" ToolTip="Moderated channel"/>
+                <ToggleButton Content="t" IsChecked="{Binding Mode_t_Toggled}" Command="local:ChannelInfoWindow.Mode_t_Command" ToolTip="Only Ops can set topic"/>
+                <ToggleButton Content="i" IsChecked="{Binding Mode_i_Toggled}" Command="local:ChannelInfoWindow.Mode_i_Command" ToolTip="Invite-only channel"/>
+                <ToggleButton Content="n" IsChecked="{Binding Mode_n_Toggled}" Command="local:ChannelInfoWindow.Mode_n_Command" ToolTip="No external messages"/>
+                <ToggleButton Content="r" IsChecked="{Binding Mode_r_Toggled}" Command="local:ChannelInfoWindow.Mode_r_Command" ToolTip="Registered-only users"/>
+                <ToggleButton Content="D" IsChecked="{Binding Mode_D_Toggled}" Command="local:ChannelInfoWindow.Mode_D_Command" ToolTip="Deaf channel"/>
+                <ToggleButton Content="d" IsChecked="{Binding Mode_d_Toggled}" Command="local:ChannelInfoWindow.Mode_d_Command" ToolTip="Some are remained deaf in the channel"/>
+                <ToggleButton Content="R" IsChecked="{Binding Mode_R_Toggled}" Command="local:ChannelInfoWindow.Mode_R_Command" ToolTip="Registered channel"/>
+                <ToggleButton Content="l" IsChecked="{Binding Mode_l_Toggled}" Command="local:ChannelInfoWindow.Mode_l_Command" ToolTip="Set channel limit"/>
+                <TextBox x:Name="LimTxtBx" MinWidth="25" Text="{Binding LimitStrNr, UpdateSourceTrigger=LostFocus}" KeyUp="TxtBx_KeyUp"/>
+                <ToggleButton Content="k" IsChecked="{Binding Mode_k_Toggled}" Command="local:ChannelInfoWindow.Mode_k_Command" ToolTip="Set channel key"/>
+                <TextBox x:Name="KeyTxtBx" MinWidth="75" Text="{Binding KeyStr, UpdateSourceTrigger=LostFocus}" KeyUp="TxtBx_KeyUp"/>
+            </DockPanel>
+            <TabControl x:Name="ModesTab" DockPanel.Dock="Top">
+                <TabControl.ContentTemplate>
+                    <DataTemplate DataType="{x:Type local:ChannelInfoWindow}">
+                        <StackPanel>
+                            <DataGrid ItemsSource="{Binding}" AutoGenerateColumns="False" IsReadOnly="True" ColumnWidth="*" ColumnHeaderStyle="{StaticResource CenterGridHeaderStyle}" CellStyle="{StaticResource CenterCellStyle}">
+                                <DataGrid.CommandBindings>
+                                    <CommandBinding Command="global:ChatControl.JoinCommand" Executed="ExecuteJoin"/>
+                                </DataGrid.CommandBindings>
+                                <DataGrid.InputBindings>
+                                    <MouseBinding Gesture="LeftDoubleClick" Command="global:ChatControl.JoinCommand" CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}, Path=SelectedItem.InvitedTo}" CommandTarget="{Binding Path=PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                </DataGrid.InputBindings>
+                                <DataGrid.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Command="global:ChatControl.JoinCommand" CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Parent.PlacementTarget.SelectedItem.InvitedTo}" CommandTarget="{Binding Path=PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                    </ContextMenu>
+                                </DataGrid.ContextMenu>
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Invited To" Binding="{Binding InvitedTo}"/>
+                                    <DataGridTextColumn Header="Invited By" Binding="{Binding InvitedBy}"/>
+                                    <DataGridTextColumn Header="Timestamp" Binding="{Binding Timestamp, StringFormat='yyyy.MM.dd HH:mm'}"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </StackPanel>
+                    </DataTemplate>
+                </TabControl.ContentTemplate>
+                <TabItem x:Name="BanTab" Header="Bans" Content="{Binding BanList}" ContentTemplate="{StaticResource ResourceKey=BansAndExceptionsTemplate}"/>
+                <TabItem Header="Exceptions" Content="{Binding ExceptsList}" ContentTemplate="{StaticResource BansAndExceptionsTemplate}"/>
+                <TabItem Header="Invites" Content="{Binding InvitesList}"/>
+            </TabControl>
+        </DockPanel>
+    </Grid>
+</Window>

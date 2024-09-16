@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Floe.Net;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -31,6 +32,10 @@ namespace Floe.UI
 
 		public NicknameItem(string nick)
 		{
+			if (nick.Contains("!"))
+			{
+				nick = nick[0] + new IrcPeer(nick.Substring(1)).Nickname;
+			}
 			var level = ChannelLevel.Normal;
 			int i = 0;
 			for (i = 0; i < nick.Length && !IsNickChar(nick[i]); i++)

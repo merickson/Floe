@@ -6,6 +6,8 @@ namespace Floe.Configuration
 {
 	public class WindowsElement : ConfigurationElement, INotifyPropertyChanged
 	{
+		public static EventHandler OrientationChanged;
+
 		[ConfigurationProperty("placement")]
 		public string Placement
 		{
@@ -41,7 +43,7 @@ namespace Floe.Configuration
 			set { this["chromeOpacity"] = value; this.OnPropertyChanged("ChromeOpacity"); }
 		}
 
-		[ConfigurationProperty("backgroundOpacity", DefaultValue = 0.92)]
+		[ConfigurationProperty("backgroundOpacity", DefaultValue = 1.0)]
 		public double BackgroundOpacity
 		{
 			get { return (double)this["backgroundOpacity"]; }
@@ -55,11 +57,14 @@ namespace Floe.Configuration
 			set { this["minimizeToSysTray"] = value; this.OnPropertyChanged("MinimizeToSysTray"); }
 		}
 
-		[ConfigurationProperty("tabStripPosition", DefaultValue=TabStripPosition.Bottom)]
+		[ConfigurationProperty("tabStripPosition", DefaultValue=TabStripPosition.Right)]
 		public TabStripPosition TabStripPosition
 		{
 			get { return (TabStripPosition)this["tabStripPosition"]; }
-			set { this["tabStripPosition"] = value; this.OnPropertyChanged("TabStripPosition"); }
+			set { this["tabStripPosition"] = value; this.OnPropertyChanged("TabStripPosition");
+				if (OrientationChanged != null)
+					OrientationChanged(this, new EventArgs());
+			}
 		}
 
 		[ConfigurationProperty("minTabWidth", DefaultValue = 75.0)]

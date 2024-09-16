@@ -88,7 +88,7 @@ namespace Floe.UI
 			if (this.IsConnected)
 			{
 				this.Session.SendCtcp(this.Target, new CtcpCommand("ACTION", slapString.Split(' ')), false);
-				this.Write("Own", string.Format("{0} {1}", this.Session.Nickname, slapString));
+				this.Write("Action", string.Format("{0} {1}", this.Session.Nickname, slapString));
 			}
 		}
 	}

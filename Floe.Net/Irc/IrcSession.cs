@@ -198,7 +198,7 @@ namespace Floe.Net
 		/// <summary>
 		/// Fires when the topic of a channel has been changed.
 		/// </summary>
-        public event EventHandler<IrcTopicEventArgs> TopicChanged;
+		public event EventHandler<IrcTopicEventArgs> TopicChanged;
 
 		/// <summary>
 		/// Fires when the session has been invited to a channel.
@@ -238,9 +238,10 @@ namespace Floe.Net
 		/// <summary>
 		/// Default constructor.
 		/// </summary>
-		public IrcSession()
+		public IrcSession(string nickName = null)
 		{
 			this.State = IrcSessionState.Disconnected;
+            this.Nickname = nickName;
 			this.UserModes = new char[0];
 			_syncContext = SynchronizationContext.Current;
 
@@ -392,6 +393,25 @@ namespace Floe.Net
 		}
 
 		/// <summary>
+		/// Request an oper
+		/// </summary>
+		/// <param name="parameters">The optional command parameters.</param>
+		public void Oper(params string[] parameters)
+		{
+			this.Send("OPER", parameters);
+		}
+
+		/// <summary>
+		/// Kill a user. The session must be an IRC Operator.
+		/// </summary>
+		/// <param name="target">The user who will be killed.</param>
+		/// <param name="message">The kill message.</param>
+		public void Kill(IrcTarget target, string message)
+		{
+			this.Send("KILL", target, message);
+		}
+
+		/// <summary>
 		/// Change the nickname.
 		/// </summary>
 		/// <param name="newNickname">The new nickname.</param>
@@ -470,6 +490,16 @@ namespace Floe.Net
 		}
 
 		/// <summary>
+		/// Part (leave) a channel with message.
+		/// </summary>
+		/// <param name="channel">The channel to leave.</param>
+		/// <param name="text"> The optional part message.</param>
+		public void Part(string channel, string text)
+		{
+			this.Send("PART", channel, text);
+		}
+
+		/// <summary>
 		/// Change the topic on a channel. The session must have the appropriate permissions on the channel.
 		/// </summary>
 		/// <param name="channel">The channel on which to set a new topic.</param>
@@ -486,6 +516,14 @@ namespace Floe.Net
 		public void Topic(string channel)
 		{
 			this.Send("TOPIC", channel);
+		}
+
+		/// <summary>
+		/// Query the actual list of channels invited to.
+		/// </summary>
+		public void Invite()
+		{
+			this.Send("INVITE");
 		}
 
 		/// <summary>
@@ -743,6 +781,14 @@ namespace Floe.Net
 			}
 		}
 
+		public bool ContainsHandler(IrcCodeHandler capture)
+		{
+			lock (_captures)
+			{
+				return _captures.Contains(capture);
+			}
+		}
+
 		private void RaiseEvent<T>(EventHandler<T> evt, T e) where T : EventArgs
 		{
 			if (evt != null)
@@ -887,9 +933,10 @@ namespace Floe.Net
 				case "MODE":
 					this.OnMode(e.Message);
 					break;
-                case "CAP":
-                    this.OnCap(e.Message);
-                    break;
+				case "CAP":
+					this.OnCap(e.Message);
+					break;
+				case "ERROR":
 				default:
 					this.OnOther(e.Message);
 					break;
@@ -953,7 +1000,11 @@ namespace Floe.Net
 		{
 			var handler = this.Joined;
 			var e = new IrcJoinEventArgs(message);
-			if (this.IsSelf(e.Who.Nickname))
+			if (e.Who == null)
+			{
+				handler = this.SelfJoined;
+			}
+			else if (this.IsSelf(e.Who.Nickname))
 			{
 				handler = this.SelfJoined;
 			}
@@ -1012,30 +1063,32 @@ namespace Floe.Net
 			}
 		}
 
-        // IRCv3 Client Capability Negotiation
-        private void OnCap(IrcMessage message)
-        {
-            if (message.Parameters.Count >= 2)
-            {
-                switch (message.Parameters[1].ToUpper())
-                {
-                    //  RIGHT NOW WE DON'T CARE, we're just supporting one thing and ZNC 1.4 doesn't really
-                    // follow the spec like I thought it would...
-                    // We don't really even need to do anything about "ACK" but we might want to handle "NAK"
-                    // in case ZNC 1.5 or whatever drops znc.in/server-time-iso in favor of server-time...
-                    case "LS":      // Server listed capabilities. END or REQ.
-                        break;
-                    case "ACK":     // Server acknowledged. Turn it on.
-                        break;
-                    case "NAK":     // Server rejected. Turn it off.
-                        break;
-                    case "LIST":    // Server listed. Make sure we match?
-                        break;
-                    default:        // Who cares?
-                        break;
-                }
-            }
-        }
+		// IRCv3 Client Capability Negotiation
+		private void OnCap(IrcMessage message)
+		{
+			if (message.Parameters.Count >= 2)
+			{
+				switch (message.Parameters[1].ToUpper())
+				{
+					//  RIGHT NOW WE DON'T CARE, we're just supporting one thing and ZNC 1.4 doesn't really
+					// follow the spec like I thought it would...
+					// We don't really even need to do anything about "ACK" but we might want to handle "NAK"
+					// in case ZNC 1.5 or whatever drops znc.in/server-time-iso in favor of server-time...
+					case "LS":      // Server listed capabilities. END or REQ.
+						_conn.QueueMessage(new IrcMessage("CAP REQ", message.Parameters.Skip(2).ToArray()));
+						break;
+					case "ACK":     // Server acknowledged. Turn it on.
+						_conn.QueueMessage(new IrcMessage("CAP", "END"));
+						break;
+					case "NAK":     // Server rejected. Turn it off.
+						break;
+					case "LIST":    // Server listed. Make sure we match?
+						break;
+					default:        // Who cares?
+						break;
+				}
+			}
+		}
 
 		private void OnOther(IrcMessage message)
 		{
@@ -1074,6 +1127,11 @@ namespace Floe.Net
 
 				this.RaiseEvent(this.InfoReceived, e);
 			}
+			else if (message.Command == "ERROR")
+			{
+				var e = new IrcInfoEventArgs(new IrcMessage(((int)IrcCode.ERR_ERROR).ToString(), message.Parameters.ToArray()));
+				this.RaiseEvent(this.InfoReceived, e);
+			}
 		}
 
 		private void OnCtcpCommand(IrcMessage message)
@@ -1102,10 +1160,10 @@ namespace Floe.Net
 				Dns.GetHostEntry(string.Empty).AddressList
 				.Where((ip) => ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork).FirstOrDefault();
 
-            // IRCv3 Client Capability Negotiation
-            //_conn.QueueMessage(new IrcMessage("CAP", "LS"));
-            // NEGOTIATION? I MEANT A ONE-SIDED DEMAND.
-            _conn.QueueMessage(new IrcMessage("CAP", "REQ", "znc.in/server-time-iso"));
+			// IRCv3 Client Capability Negotiation
+			_conn.QueueMessage(new IrcMessage("CAP", "LS"));
+			// NEGOTIATION? I MEANT A ONE-SIDED DEMAND.
+			_conn.QueueMessage(new IrcMessage("CAP", "REQ", "znc.in/server-time-iso"));
 
 			if (!string.IsNullOrEmpty(_password))
 			{
@@ -1131,6 +1189,6 @@ namespace Floe.Net
 				_isWaitingForActivity = true;
 				this.Send("PING", this.Server);
 			}
-        }
+		}
 	}
 }

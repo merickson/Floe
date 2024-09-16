@@ -10,13 +10,13 @@ namespace Floe.UI.Interop
 	[StructLayout(LayoutKind.Sequential)]
 	public struct CHOOSECOLOR
 	{
-		public int lStructSize;
+		public long lStructSize;
 		public IntPtr hwndOwner;
 		public IntPtr hInstance;
-		public uint rgbResult;
+		public ulong rgbResult;
 		public IntPtr lpCustColors;
-		public int Flags;
-		public Int32 lCustData;
+		public long Flags;
+		public Int64 lCustData;
 		public IntPtr lpfnHook;
 		public IntPtr lpTemplateName;
 	}

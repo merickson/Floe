@@ -5,6 +5,8 @@ namespace Floe.Configuration
 	public enum TabStripPosition
 	{
 		Top,
-		Bottom
+		Bottom,
+		Left,
+		Right
 	}
 }
